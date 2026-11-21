@@ -1,0 +1,2360 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>まるもちWeb入門ドリル - 楽しく学ぶWebの仕組み</title>
+  <style>
+    /* CSS変数・デザインシステム */
+    :root {
+      --primary: #C2410C;       /* オレンジメイン */
+      --primary-hover: #9A3412;
+      --primary-light: #FFEDD5; /* 薄いオレンジ背景 */
+      --primary-border: #FDBA74;
+      --accent: #EA580C;
+      --bg: #FAFAF9;            /* やさしいストーン系オフホワイト */
+      --card-bg: #FFFFFF;
+      --text: #1C1917;          /* 読みやすいスレートブラック */
+      --text-muted: #78716C;
+      --border: #E7E5E4;
+      --success: #15803D;
+      --success-bg: #DCFCE7;
+      --error: #B91C1C;
+      --error-bg: #FEE2E2;
+      --info-bg: #E0F2FE;
+      --info-text: #0369A1;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+      --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.08), 0 2px 4px -2px rgba(0,0,0,0.05);
+      --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1);
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 20px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Hiragino Sans", "Meiryo", sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      font-size: 16px;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    /* アプリ共通コンテナ（スマホ最適化 1カラム） */
+    .app-container {
+      width: 100%;
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 16px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ヘッダー */
+    header.main-header {
+      background: var(--card-bg);
+      border-bottom: 2px solid var(--primary-border);
+      padding: 14px 16px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: var(--shadow-sm);
+    }
+    .header-inner {
+      max-width: 680px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .brand-icon {
+      font-size: 26px;
+      line-height: 1;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+    }
+    .brand-title {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--primary);
+      letter-spacing: -0.02em;
+    }
+    .header-badge {
+      background: var(--primary-light);
+      color: var(--primary);
+      font-size: 0.8rem;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--primary-border);
+    }
+
+    /* まるもちキャラクター（CSSアニメーション） */
+    .marumochi-avatar {
+      width: 52px;
+      height: 52px;
+      background: #FFF;
+      border: 3px solid var(--primary);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      position: relative;
+      flex-shrink: 0;
+      box-shadow: 0 3px 6px rgba(194, 65, 12, 0.15);
+      animation: mochi-bounce 3s infinite ease-in-out;
+    }
+    @keyframes mochi-bounce {
+      0%, 100% { transform: translateY(0) scale(1, 1); }
+      50% { transform: translateY(-4px) scale(1.02, 0.98); }
+    }
+
+    /* まるもち吹き出し */
+    .marumochi-speech {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .bubble {
+      background: var(--card-bg);
+      border: 2px solid var(--primary-border);
+      border-radius: var(--radius-md);
+      padding: 14px 18px;
+      position: relative;
+      flex: 1;
+      font-size: 0.98rem;
+      box-shadow: var(--shadow-sm);
+    }
+    .bubble::before {
+      content: "";
+      position: absolute;
+      top: 16px;
+      left: -9px;
+      width: 0;
+      height: 0;
+      border-top: 8px solid transparent;
+      border-bottom: 8px solid transparent;
+      border-right: 9px solid var(--primary-border);
+    }
+    .bubble::after {
+      content: "";
+      position: absolute;
+      top: 17px;
+      left: -6px;
+      width: 0;
+      height: 0;
+      border-top: 7px solid transparent;
+      border-bottom: 7px solid transparent;
+      border-right: 7px solid var(--card-bg);
+    }
+    .bubble-name {
+      font-weight: 800;
+      font-size: 0.85rem;
+      color: var(--primary);
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* カードUI */
+    .card {
+      background: var(--card-bg);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+      padding: 20px;
+      margin-bottom: 16px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    /* ボタン */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px 20px;
+      font-size: 1rem;
+      font-weight: 700;
+      border-radius: var(--radius-sm);
+      border: none;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      text-decoration: none;
+      user-select: none;
+      min-height: 48px;
+    }
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+      box-shadow: 0 2px 4px rgba(194, 65, 12, 0.25);
+    }
+    .btn-primary:hover:not(:disabled) {
+      background: var(--primary-hover);
+      transform: translateY(-1px);
+    }
+    .btn-primary:active:not(:disabled) {
+      transform: translateY(1px);
+    }
+    .btn-outline {
+      background: white;
+      color: var(--text);
+      border: 2px solid var(--border);
+    }
+    .btn-outline:hover:not(:disabled) {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+    .btn-block {
+      width: 100%;
+    }
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none !important;
+    }
+
+    /* ステージマップ（トップ画面） */
+    .stage-section {
+      margin-bottom: 24px;
+    }
+    .stage-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      padding-bottom: 6px;
+      border-bottom: 2px solid var(--primary-light);
+    }
+    .stage-title {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .stage-desc {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+    }
+    .lesson-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .lesson-item {
+      background: var(--card-bg);
+      border: 2px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      text-decoration: none;
+      color: inherit;
+    }
+    .lesson-item:hover {
+      border-color: var(--primary-border);
+      box-shadow: var(--shadow-sm);
+      transform: translateX(3px);
+    }
+    .lesson-item.completed {
+      border-color: var(--success);
+      background: #F0FDF4;
+    }
+    .lesson-info {
+      flex: 1;
+      padding-right: 12px;
+    }
+    .lesson-code {
+      font-size: 0.75rem;
+      font-weight: 800;
+      color: var(--primary);
+      background: var(--primary-light);
+      padding: 2px 6px;
+      border-radius: 4px;
+      display: inline-block;
+      margin-bottom: 4px;
+    }
+    .lesson-item.completed .lesson-code {
+      background: #DCFCE7;
+      color: var(--success);
+    }
+    .lesson-title-text {
+      font-weight: 700;
+      font-size: 1rem;
+      color: var(--text);
+    }
+    .lesson-sub {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+    .lesson-status-icon {
+      font-size: 22px;
+      flex-shrink: 0;
+    }
+    .stage-locked {
+      opacity: 0.65;
+      background: #F5F5F4;
+      border-style: dashed;
+    }
+    .stage-locked:hover {
+      transform: none;
+      border-color: var(--border);
+      cursor: default;
+    }
+    .badge-locked {
+      background: #E7E5E4;
+      color: #78716C;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 4px;
+    }
+
+    /* プログレスバー */
+    .progress-bar-container {
+      background: #E7E5E4;
+      height: 8px;
+      border-radius: 999px;
+      overflow: hidden;
+      margin: 8px 0 16px 0;
+    }
+    .progress-bar-fill {
+      background: var(--primary);
+      height: 100%;
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    /* レッスン画面 */
+    .lesson-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+    .btn-back {
+      font-size: 0.9rem;
+      padding: 8px 14px;
+      min-height: 40px;
+    }
+
+    /* スライドエリア */
+    .slides-wrapper {
+      background: #FFF;
+      border: 2px solid var(--primary-border);
+      border-radius: var(--radius-md);
+      padding: 20px;
+      margin-bottom: 20px;
+      position: relative;
+      box-shadow: var(--shadow-sm);
+    }
+    .slide-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--primary-light);
+      color: var(--primary);
+      font-size: 0.8rem;
+      font-weight: 800;
+      padding: 3px 10px;
+      border-radius: 999px;
+      margin-bottom: 12px;
+    }
+    .slide-title {
+      font-size: 1.25rem;
+      font-weight: 800;
+      margin-bottom: 10px;
+      color: var(--text);
+    }
+    .slide-body {
+      font-size: 1rem;
+      color: #374151;
+      margin-bottom: 16px;
+      line-height: 1.7;
+    }
+    .slide-figure {
+      background: var(--bg);
+      border-radius: var(--radius-sm);
+      border: 1px dashed var(--primary-border);
+      padding: 16px;
+      margin-bottom: 16px;
+      text-align: center;
+    }
+    .slide-controls {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+    }
+    .slide-dots {
+      display: flex;
+      gap: 6px;
+    }
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #D1D5DB;
+      transition: background 0.2s;
+    }
+    .dot.active {
+      background: var(--primary);
+      width: 20px;
+      border-radius: 10px;
+    }
+
+    /* CSS図解コンポーネント */
+    .diag-flow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      padding: 8px 0;
+    }
+    .diag-box {
+      background: white;
+      border: 2px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 10px 14px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      box-shadow: var(--shadow-sm);
+    }
+    .diag-box.highlight {
+      border-color: var(--primary);
+      background: var(--primary-light);
+      color: var(--primary);
+    }
+    .diag-arrow {
+      color: var(--primary);
+      font-size: 1.2rem;
+      font-weight: 800;
+    }
+
+    /* 完成例（worked-example）ボックス */
+    .example-card {
+      background: #FFFBEB;
+      border: 2px solid #FCD34D;
+      border-radius: var(--radius-md);
+      padding: 16px 18px;
+      margin-bottom: 24px;
+    }
+    .example-label {
+      font-size: 0.85rem;
+      font-weight: 800;
+      color: #B45309;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 8px;
+    }
+    .example-scene {
+      font-size: 0.95rem;
+      color: #78350F;
+      margin-bottom: 8px;
+    }
+    .example-answer-box {
+      background: white;
+      border: 2px solid #F59E0B;
+      border-radius: var(--radius-sm);
+      padding: 10px 14px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #92400E;
+      margin-bottom: 8px;
+    }
+    .example-reason {
+      font-size: 0.9rem;
+      color: #92400E;
+      line-height: 1.5;
+    }
+
+    /* 演習問題カード */
+    .problem-card {
+      background: white;
+      border: 2px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    .problem-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .problem-tag {
+      background: var(--primary-light);
+      color: var(--primary);
+      font-weight: 800;
+      font-size: 0.8rem;
+      padding: 3px 10px;
+      border-radius: 999px;
+    }
+    .problem-scene-box {
+      background: #F8FAFC;
+      border-left: 4px solid var(--accent);
+      padding: 12px 14px;
+      margin-bottom: 14px;
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    }
+    .scene-title {
+      font-size: 0.85rem;
+      font-weight: 800;
+      color: #475569;
+      margin-bottom: 4px;
+    }
+    .scene-desc {
+      font-size: 0.98rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+    .problem-question {
+      font-size: 1.05rem;
+      font-weight: 800;
+      margin-bottom: 16px;
+      line-height: 1.5;
+    }
+
+    /* 選択肢ボタン */
+    .choices-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .choice-btn {
+      background: white;
+      border: 2px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 14px 18px;
+      text-align: left;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text);
+      cursor: pointer;
+      transition: all 0.15s ease;
+      min-height: 52px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      line-height: 1.4;
+    }
+    .choice-btn:hover {
+      border-color: var(--primary-border);
+      background: var(--primary-light);
+    }
+    .choice-btn.selected {
+      border-color: var(--primary);
+      background: var(--primary-light);
+      color: var(--primary);
+      font-weight: 700;
+    }
+    .choice-key {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: #F3F4F6;
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      font-weight: 800;
+      flex-shrink: 0;
+      color: var(--text-muted);
+    }
+    .choice-btn.selected .choice-key {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+
+    /* 入力フォーム & クイック挿入ボタン */
+    .input-group {
+      margin-bottom: 16px;
+    }
+    .text-input {
+      width: 100%;
+      padding: 14px 16px;
+      font-size: 1.1rem;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      border: 2px solid var(--border);
+      border-radius: var(--radius-sm);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .text-input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(194, 65, 12, 0.15);
+    }
+    .quick-chips-wrapper {
+      margin-top: 10px;
+    }
+    .quick-chips-label {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .chips-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .chip-btn {
+      background: #F3F4F6;
+      border: 1px solid #D1D5DB;
+      border-radius: 6px;
+      padding: 6px 12px;
+      font-size: 0.88rem;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-weight: 700;
+      color: #374151;
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.1s ease;
+    }
+    .chip-btn:hover {
+      background: var(--primary-light);
+      border-color: var(--primary-border);
+      color: var(--primary);
+    }
+    .chip-btn:active {
+      transform: scale(0.96);
+    }
+
+    /* フィードバック表示エリア */
+    .feedback-box {
+      border-radius: var(--radius-md);
+      padding: 16px;
+      margin-top: 16px;
+      display: none;
+      animation: fadeIn 0.25s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .feedback-box.correct {
+      background: var(--success-bg);
+      border: 2px solid var(--success);
+      color: #14532D;
+    }
+    .feedback-box.incorrect {
+      background: var(--error-bg);
+      border: 2px solid var(--error);
+      color: #7F1D1D;
+    }
+    .feedback-header {
+      font-weight: 800;
+      font-size: 1.05rem;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .feedback-msg {
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+
+    /* ヒント機能アコーディオン */
+    .hints-section {
+      margin-top: 16px;
+      border-top: 1px dashed var(--border);
+      padding-top: 14px;
+    }
+    .hint-step-box {
+      background: #F8FAFC;
+      border: 1px solid #E2E8F0;
+      border-radius: var(--radius-sm);
+      padding: 10px 14px;
+      margin-top: 8px;
+      font-size: 0.9rem;
+      color: #334155;
+    }
+    .hint-btn {
+      background: none;
+      border: none;
+      color: var(--primary);
+      font-weight: 700;
+      font-size: 0.9rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 0;
+    }
+    .hint-btn:hover {
+      text-decoration: underline;
+    }
+
+    /* レッスン完了後まとめ */
+    .after-note-card {
+      background: #EFF6FF;
+      border: 2px solid #93C5FD;
+      border-radius: var(--radius-md);
+      padding: 18px;
+      margin-top: 20px;
+    }
+    .after-note-title {
+      color: #1E40AF;
+      font-weight: 800;
+      font-size: 1rem;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .after-note-body {
+      font-size: 0.95rem;
+      color: #1E3A8A;
+      line-height: 1.6;
+    }
+
+    /* モーダル（お祝いなど） */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 20px;
+      backdrop-filter: blur(3px);
+    }
+    .modal-card {
+      background: white;
+      border-radius: var(--radius-lg);
+      padding: 28px 24px;
+      max-width: 480px;
+      width: 100%;
+      text-align: center;
+      box-shadow: var(--shadow-lg);
+      animation: popUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    @keyframes popUp {
+      from { transform: scale(0.85); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    .modal-icon {
+      font-size: 64px;
+      margin-bottom: 12px;
+      line-height: 1;
+    }
+    .modal-title {
+      font-size: 1.45rem;
+      font-weight: 800;
+      color: var(--primary);
+      margin-bottom: 10px;
+    }
+    .modal-desc {
+      font-size: 1rem;
+      color: #4B5563;
+      margin-bottom: 24px;
+      line-height: 1.6;
+    }
+
+    /* フッター */
+    footer.main-footer {
+      border-top: 1px solid var(--border);
+      background: white;
+      padding: 16px;
+      text-align: center;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-top: auto;
+    }
+
+    /* ユーティリティ */
+    .hidden { display: none !important; }
+    .mt-2 { margin-top: 8px; }
+    .mt-4 { margin-top: 16px; }
+    .mb-2 { margin-bottom: 8px; }
+    .mb-4 { margin-bottom: 16px; }
+    .text-center { text-align: center; }
+    .font-mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
+  </style>
+</head>
+<body>
+
+  <!-- ヘッダー -->
+  <header class="main-header">
+    <div class="header-inner">
+      <div class="brand" onclick="App.goHome()">
+        <span class="brand-icon">🍡</span>
+        <span class="brand-title">まるもちWeb入門ドリル</span>
+      </div>
+      <div class="header-badge" id="globalProgressBadge">進捗 0 / 11</div>
+    </div>
+  </header>
+
+  <!-- メインコンテナ -->
+  <main class="app-container">
+
+    <!-- 案内役まるもちの吹き出し (トップ・レッスン共通) -->
+    <div class="marumochi-speech" id="marumochiBanner">
+      <div class="marumochi-avatar" id="mochiFace">🍡</div>
+      <div class="bubble">
+        <div class="bubble-name">まるもち 🍡</div>
+        <div id="marumochiText">やっほー！まるもちだよ。Webの世界へようこそ！一緒に「お願いと返事」の秘密を解き明かそう！</div>
+      </div>
+    </div>
+
+    <!-- 画面1: トップ画面（ステージ一覧マップ） -->
+    <section id="viewHome">
+      <div class="card" style="border: 2px solid var(--primary-border); background: #FFF7ED;">
+        <h2 style="font-size:1.15rem; font-weight:800; color:var(--primary); margin-bottom:4px;">Webアプリの仕組みを楽しくマスター！</h2>
+        <p style="font-size:0.9rem; color:#7C2D12;">ブラウザとサーバーの役割分担、HTTPリクエスト・レスポンス、ステータスコードを「場面→判断」形式で体感できます。</p>
+        <div class="progress-bar-container" style="margin-top:12px;">
+          <div class="progress-bar-fill" id="homeProgressBar"></div>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.8rem; color:#9A3412;">
+          <span id="homeProgressPercent">達成率 0%</span>
+          <button class="btn btn-outline" style="min-height:30px; padding:2px 8px; font-size:0.75rem;" onclick="App.resetProgress()">進捗リセット</button>
+        </div>
+      </div>
+
+      <!-- ステージ一覧動的描画エリア -->
+      <div id="stagesContainer"></div>
+    </section>
+
+    <!-- 画面2: レッスン画面 -->
+    <section id="viewLesson" class="hidden">
+      <!-- レッスンナビゲーション -->
+      <div class="lesson-nav">
+        <button class="btn btn-outline btn-back" onclick="App.goHome()">← ステージ一覧</button>
+        <div style="text-align:right;">
+          <span class="lesson-code" id="lessonCodeBadge">p-01</span>
+          <div style="font-size:0.75rem; color:var(--text-muted);" id="lessonStepIndicator">問題 1 / 2</div>
+        </div>
+      </div>
+
+      <!-- レッスンタイトル -->
+      <div style="margin-bottom:16px;">
+        <h1 style="font-size:1.35rem; font-weight:800; color:var(--text);" id="lessonTitle">Webアプリってなに？</h1>
+        <p style="font-size:0.88rem; color:var(--text-muted);" id="lessonSubtitle">ブラウザとサーバーの「お願いと返事」</p>
+      </div>
+
+      <!-- ① スライド学習カード（カード数枚めくり） -->
+      <div class="slides-wrapper" id="slidesWrapper">
+        <div class="slide-badge" id="slideNumberBadge">スライド 1 / 3</div>
+        <h3 class="slide-title" id="slideTitle">スライドタイトル</h3>
+        <p class="slide-body" id="slideBody">スライド説明文</p>
+        <div class="slide-figure" id="slideFigure">
+          <!-- CSS図解が動的に入る -->
+        </div>
+        <div class="slide-controls">
+          <button class="btn btn-outline" style="padding:6px 14px; min-height:38px; font-size:0.85rem;" id="btnPrevSlide" onclick="App.prevSlide()">← 前へ</button>
+          <div class="slide-dots" id="slideDots"></div>
+          <button class="btn btn-primary" style="padding:6px 14px; min-height:38px; font-size:0.85rem;" id="btnNextSlide" onclick="App.nextSlide()">次へ →</button>
+        </div>
+      </div>
+
+      <!-- ② 完成例（worked-example）カード -->
+      <div class="example-card" id="exampleCard">
+        <div class="example-label">💡 解き方の完成例（worked-example）</div>
+        <div class="example-scene" id="exampleScene">【場面】レストランで店員さんに「オムライスください」と注文して料理を受け取る</div>
+        <div class="example-answer-box" id="exampleAnswer">お願い（注文）と返事（料理）</div>
+        <div class="example-reason" id="exampleReason">理由：Webアプリもこれと同じ「お願い」と「返事」の2人組で動いています。</div>
+      </div>
+
+      <!-- ③ 演習問題カード -->
+      <div class="problem-card" id="problemCard">
+        <div class="problem-header">
+          <span class="problem-tag" id="problemTag">演習 1</span>
+          <span style="font-size:0.8rem; font-weight:700; color:var(--primary);" id="problemFormatBadge">選択問題</span>
+        </div>
+
+        <div class="problem-scene-box">
+          <div class="scene-title">📌 場面（シチュエーション）</div>
+          <div class="scene-desc" id="problemScene">カフェでレジの店員さんに「アイスコーヒー1つお願いします」と伝えました。</div>
+        </div>
+
+        <div class="problem-question" id="problemQuestion">Webの世界でいうと、お客さんと店員さんはそれぞれ何に例えられるでしょう？</div>
+
+        <!-- 選択肢エリア -->
+        <div class="choices-list" id="choicesContainer"></div>
+
+        <!-- 入力式エリア -->
+        <div id="inputContainer" class="hidden">
+          <div class="input-group">
+            <input type="text" id="problemTextInput" class="text-input" placeholder="ここに入力または下のボタンをタップ" autocomplete="off" autocapitalize="off" spellcheck="false">
+            <div class="quick-chips-wrapper">
+              <div class="quick-chips-label">👇 タップしてカーソル位置に文字を挿入：</div>
+              <div class="chips-group" id="chipsGroup">
+                <!-- 挿入チップボタン -->
+                <button type="button" class="chip-btn" onclick="App.insertChip('GET')">GET</button>
+                <button type="button" class="chip-btn" onclick="App.insertChip('POST')">POST</button>
+                <button type="button" class="chip-btn" onclick="App.insertChip('PUT')">PUT</button>
+                <button type="button" class="chip-btn" onclick="App.insertChip('PATCH')">PATCH</button>
+                <button type="button" class="chip-btn" onclick="App.insertChip('DELETE')">DELETE</button>
+                <button type="button" class="chip-btn" onclick="App.insertChip('/orders/')">/orders/</button>
+                <button type="button" class="chip-btn" onclick="App.insertChip('/orders/5')">/orders/5</button>
+                <button type="button" class="chip-btn" onclick="App.insertChip('200')">200</button>
+                <button type="button" class="chip-btn" onclick="App.insertChip('201')">201</button>
+                <button type="button" class="chip-btn" onclick="App.insertChip('400')">400</button>
+                <button type="button" class="chip-btn" onclick="App.insertChip('401')">401</button>
+                <button type="button" class="chip-btn" onclick="App.insertChip('404')">404</button>
+                <button type="button" class="chip-btn" onclick="App.insertChip('500')">500</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 回答するボタン -->
+        <button class="btn btn-primary btn-block" id="btnSubmitAnswer" onclick="App.submitAnswer()">回答する</button>
+
+        <!-- 即時フィードバック表示エリア -->
+        <div class="feedback-box" id="feedbackBox">
+          <div class="feedback-header" id="feedbackHeader">🎉 せいかい！</div>
+          <div class="feedback-msg" id="feedbackMsg">すばらしい！その通りです。</div>
+          <button class="btn btn-primary btn-block mt-4" id="btnNextProblem" onclick="App.nextProblem()">次の問題へ →</button>
+        </div>
+
+        <!-- 3段階ヒントアコーディオン -->
+        <div class="hints-section">
+          <button type="button" class="hint-btn" id="btnHintToggle" onclick="App.revealNextHint()">💡 ヒントを見る（1/3）</button>
+          <div id="hintsListContainer"></div>
+        </div>
+      </div>
+
+      <!-- レッスンクリア後のまとめノート -->
+      <div class="after-note-card hidden" id="afterNoteCard">
+        <div class="after-note-title">📝 まるもちの学びメモ</div>
+        <div class="after-note-body" id="afterNoteBody"></div>
+        <button class="btn btn-primary btn-block mt-4" onclick="App.finishLesson()">ステージ一覧に戻る 🍡</button>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- クリアお祝いモーダル -->
+  <div class="modal-overlay hidden" id="celebrationModal">
+    <div class="modal-card">
+      <div class="modal-icon" id="modalEmoji">🎉</div>
+      <h2 class="modal-title" id="modalTitle">ステージクリア！</h2>
+      <p class="modal-desc" id="modalDesc">おめでとうございます！すべてのレッスンを修了しました！</p>
+      <button class="btn btn-primary btn-block" onclick="App.closeModal()">やったね！ 🍡</button>
+    </div>
+  </div>
+
+  <!-- フッター -->
+  <footer class="main-footer">
+    <p>© RYO YOKOTA</p>
+  </footer>
+
+  <script>
+    /**
+     * ==========================================
+     * まるもちWeb入門ドリル - アプリケーション実装
+     * ==========================================
+     */
+
+    // --- レッスンデータ定義 ---
+    const STAGES_DATA = [
+      {
+        id: "prologue",
+        title: "プロローグ：Web超入門",
+        desc: "専門用語ゼロ！身近な例えだけで「Webの基本」を感覚で掴もう。",
+        status: "available",
+        lessonIds: ["p-01", "p-02", "p-03", "p-04", "p-05"]
+      },
+      {
+        id: "stage0",
+        title: "Stage 0：Webの基本の流れ",
+        desc: "URLの読み方からDNS、暗号化接続、アクセスから画面表示までの8ステップ！",
+        status: "available",
+        lessonIds: ["s0-01", "s0-02", "s0-03", "s0-04", "s0-05", "s0-06"]
+      },
+      {
+        id: "stage1",
+        title: "Stage 1：HTTPメソッドとREST基礎",
+        desc: "GET/POST/PUT/PATCH/DELETEでまるもちの注文を自由自在に操作する！",
+        status: "locked",
+        lessonIds: []
+      },
+      {
+        id: "stage2",
+        title: "Stage 2：ステータスコード完全マスター",
+        desc: "200 OK、404 Not Found、500 Internal Error…サーバーの声を聞き分ける！",
+        status: "locked",
+        lessonIds: []
+      },
+      {
+        id: "stage3",
+        title: "Stage 3：リクエストヘッダーとパラメータ",
+        desc: "パスパラメータ、クエリパラメータ、認証トークンの渡し方を学ぶ。",
+        status: "locked",
+        lessonIds: []
+      },
+      {
+        id: "stage4",
+        title: "Stage 4：レスポンスとJSONデータ形式",
+        desc: "Webの共通語「JSON」の構造をまるもち注文データで読み解く！",
+        status: "locked",
+        lessonIds: []
+      },
+      {
+        id: "stage5",
+        title: "Stage 5：Webセキュリティ超入門",
+        desc: "Cookie・セッション・トークン認証の仕組みと安全な通信。",
+        status: "locked",
+        lessonIds: []
+      },
+      {
+        id: "stage6",
+        title: "Stage 6：実践！まるもち注文APIシナリオ",
+        desc: "注文作成から照会・更新・キャンセルまでの一連の流れを通しで解く！",
+        status: "locked",
+        lessonIds: []
+      }
+    ];
+
+    const LESSONS_DATA = [
+      // ------------------------------------------------------------------------
+      // プロローグ 5レッスン (p-01 〜 p-05)
+      // ------------------------------------------------------------------------
+      {
+        id: "p-01",
+        stageId: "prologue",
+        title: "Webアプリってなに？",
+        subtitle: "ブラウザとサーバーの「お願いと返事」",
+        slides: [
+          {
+            title: "画面の向こうにいる「もう1人」",
+            body: "スマホで通販を見たり、SNSで投稿したりするとき、あなたのスマホの中だけで完結しているわけではありません。必ずインターネットの向こう側に「お願いを受け止める相手」がいます。",
+            figureHtml: `
+              <div class="diag-flow">
+                <div class="diag-box highlight">📱 あなたのスマホ</div>
+                <div class="diag-arrow">⇄ ネット ⇄</div>
+                <div class="diag-box highlight">🏢 遠くのコンピューター</div>
+              </div>
+            `
+          },
+          {
+            title: "「お願い」と「返事」のキャッチボール",
+            body: "Webアプリの基本は、カフェやレストランと全く同じです。「アイスコーヒーください」とお願いして、店員さんが「はいどうぞ」とお返事（商品）を渡してくれます。",
+            figureHtml: `
+              <div class="diag-flow">
+                <div class="diag-box">お客さん 🍡<br><small>「これ見せて！」</small></div>
+                <div class="diag-arrow">➡️ お願い ➡️<br>⬅️ お返事 ⬅️</div>
+                <div class="diag-box">店員さん ☕<br><small>「はいどうぞ！」</small></div>
+              </div>
+            `
+          },
+          {
+            title: "Webの世界の呼び名",
+            body: "お願いを出す側のスマホやパソコンを『クライアント（ブラウザ）』、お願いを受け取って返事をする側のコンピューターを『サーバー』と呼びます。",
+            figureHtml: `
+              <div class="diag-flow">
+                <div class="diag-box highlight">ブラウザ（Client）<br><small>お願いを出す側</small></div>
+                <div class="diag-arrow">⇄</div>
+                <div class="diag-box highlight">サーバー（Server）<br><small>お返事を返す側</small></div>
+              </div>
+            `
+          }
+        ],
+        example: {
+          scene: "レストランで店員さんに「オムライスください」と注文して、料理を受け取る場面",
+          answer: "お客さん＝ブラウザ、店員さん＝サーバー",
+          reason: "お願いを出すのが「ブラウザ（あなた）」で、用意して返事をするのが「サーバー」です。"
+        },
+        problems: [
+          {
+            id: "p-01-1",
+            scene: "カフェでレジの店員さんに「アイスコーヒー1つお願いします」と伝えました。",
+            question: "Webの世界でいうと、お客さんと店員さんはそれぞれ何に例えられるでしょう？",
+            type: "choice",
+            choices: [
+              "お客さん＝ブラウザ、店員さん＝サーバー",
+              "お客さん＝サーバー、店員さん＝ブラウザ",
+              "どちらもブラウザ"
+            ],
+            answer: "お客さん＝ブラウザ、店員さん＝サーバー",
+            feedback: "大正解！お願いを出すのがブラウザ（クライアント）、受け止めて用意するのがサーバーです！"
+          },
+          {
+            id: "p-01-2",
+            scene: "まるもちがスマホの画面をタップして「スタンプを買う」ボタンを押しました。",
+            question: "このとき、インターネットの向こう側で注文データを受け取るのは誰？",
+            type: "choice",
+            choices: [
+              "サーバー",
+              "ブラウザ",
+              "Wi-Fiルーター"
+            ],
+            answer: "サーバー",
+            feedback: "バッチリ！スマホ（ブラウザ）からのお願いを受け止めて処理するのは「サーバー」です！"
+          }
+        ],
+        hint1: "お願いをする人と、それに応える人をイメージしてみてね。",
+        hint2: "スマホで画面を操作している側が「ブラウザ」だよ。",
+        hint3: "答えはお客さん＝ブラウザ、店員さん＝サーバー！",
+        afterNote: "Webアプリの基本は「お願い（リクエスト）」と「返事（レスポンス）」のキャッチボール！すべての基本はここから始まります。"
+      },
+      {
+        id: "p-02",
+        stageId: "prologue",
+        title: "ブラウザとサーバー",
+        subtitle: "画面を出す側と、計算・保存をする側の分担",
+        slides: [
+          {
+            title: "それぞれの得意ワザ",
+            body: "Webアプリは2人のチームプレイです。ブラウザは「画面をキレイに見せる専門家」、サーバーは「計算や大切なデータを金庫に保存する専門家」です。",
+            figureHtml: `
+              <div class="diag-flow">
+                <div class="diag-box" style="border-color:#3B82F6;">🎨 ブラウザ<br><small>文字やボタンを画面に描く</small></div>
+                <div class="diag-arrow">＋</div>
+                <div class="diag-box" style="border-color:#10B981;">🗄️ サーバー<br><small>注文データの計算・安全保存</small></div>
+              </div>
+            `
+          },
+          {
+            title: "なぜスマホの中だけに保存しないの？",
+            body: "もしスマホの中にしか注文データがなかったら、スマホを落としたら注文が消えてしまいますし、お店の人は誰から注文が来たか分かりません。だから大事なデータは「サーバーの金庫」に置きます。",
+            figureHtml: `
+              <div class="diag-flow">
+                <div class="diag-box">スマホA 📱</div>
+                <div class="diag-arrow">↘️</div>
+                <div class="diag-box highlight">🏢 中央のサーバー<br><small>みんなの注文を一括管理</small></div>
+                <div class="diag-arrow">↗️</div>
+                <div class="diag-box">スマホB 📱</div>
+              </div>
+            `
+          }
+        ],
+        example: {
+          scene: "「癒しのまるもち」スタンプの購入画面で、可愛いボタンを並べて表示する",
+          answer: "ブラウザの役割",
+          reason: "画面のデザインを組み立てて人間の目に見える形にするのは、手元にあるブラウザのお仕事です。"
+        },
+        problems: [
+          {
+            id: "p-02-1",
+            scene: "まるもちのスマホ画面に、オレンジ色の「注文ボタン」をきれいに配置して表示します。",
+            question: "この「画面にデザインを表示する」お仕事を担当しているのはどっち？",
+            type: "choice",
+            choices: [
+              "ブラウザ（手元のスマホ）",
+              "サーバー（遠くのコンピューター）"
+            ],
+            answer: "ブラウザ（手元のスマホ）",
+            feedback: "正解！HTMLやCSSを解釈して、画面にボタンや文字を綺麗に描画するのはブラウザの役割です。"
+          },
+          {
+            id: "p-02-2",
+            scene: "「注文番号5：癒しのまるもち 190円」の確定データを、消えないように安全に保管します。",
+            question: "この「注文データを安全に保存・管理する」お仕事を担当しているのはどっち？",
+            type: "choice",
+            choices: [
+              "サーバー（遠くのコンピューター）",
+              "ブラウザ（手元のスマホ）"
+            ],
+            answer: "サーバー（遠くのコンピューター）",
+            feedback: "その通り！大切なデータベースの管理や保存は、サーバーがしっかりと受け持っています。"
+          }
+        ],
+        hint1: "目に見える見た目はどっちが作っているかな？",
+        hint2: "みんなのデータを一元管理する金庫は遠くのサーバーにあるよ。",
+        hint3: "画面表示はブラウザ、保存・管理はサーバーです！",
+        afterNote: "ブラウザ＝「画面のデザイナー」、サーバー＝「金庫番＆計算係」。この強力な分担があるからWebは便利なんです！"
+      },
+      {
+        id: "p-03",
+        stageId: "prologue",
+        title: "リクエストとレスポンス",
+        subtitle: "一往復が全ての基本という感覚",
+        slides: [
+          {
+            title: "Webの専門用語を1つ覚えよう",
+            body: "ブラウザが出すお願いを『リクエスト（Request）』、サーバーが返す返事を『レスポンス（Response）』と呼びます。",
+            figureHtml: `
+              <div class="diag-flow">
+                <div class="diag-box">📱 ブラウザ</div>
+                <div class="diag-arrow">➡️ <b>Request</b>（お願い） ➡️<br>⬅️ <b>Response</b>（お返事） ⬅️</div>
+                <div class="diag-box">🏢 サーバー</div>
+              </div>
+            `
+          },
+          {
+            title: "1往復完結のシンプルな世界",
+            body: "Webのやりとりは、基本的に「1回お願いして、1回返事をもらう」という1往復の繰り返しで成り立っています。このリズムを体で覚えましょう！",
+            figureHtml: `
+              <div class="diag-flow">
+                <div class="diag-box">1. お願いを投げる</div>
+                <div class="diag-arrow">➡️</div>
+                <div class="diag-box">2. 返事を受け取る</div>
+                <div class="diag-arrow">➡️</div>
+                <div class="diag-box">完結！🎉</div>
+              </div>
+            `
+          }
+        ],
+        example: {
+          scene: "ブラウザが「注文番号5のデータをちょうだい！」とサーバーに頼む",
+          answer: "リクエスト（Request）",
+          reason: "ブラウザからサーバーへ何かを求めて送る「お願い」のことをリクエストと呼びます。"
+        },
+        problems: [
+          {
+            id: "p-03-1",
+            scene: "まるもちが「過去の注文履歴を見たいな」とリンクをタップしました。このときスマホがサーバーに送るものは？",
+            question: "ブラウザからサーバーへ送る「お願い」の呼び名はどれ？",
+            type: "choice",
+            choices: [
+              "リクエスト（Request）",
+              "レスポンス（Response）",
+              "ダウンロード"
+            ],
+            answer: "リクエスト（Request）",
+            feedback: "大正解！ブラウザからサーバーへ投げるお願いを「リクエスト」と言います！"
+          },
+          {
+            id: "p-03-2",
+            scene: "サーバーが「はい、注文履歴のデータだよ！」とスマホに送り返してきました。",
+            question: "サーバーからブラウザへ戻ってくる「お返事」の呼び名はどれ？",
+            type: "choice",
+            choices: [
+              "レスポンス（Response）",
+              "リクエスト（Request）",
+              "アップロード"
+            ],
+            answer: "レスポンス（Response）",
+            feedback: "お見事！サーバーが返してくれる返事が「レスポンス」です。リクエストとレスポンスでワンセット！"
+          }
+        ],
+        hint1: "英語の Request は「頼む・要請する」という意味だよ。",
+        hint2: "英語の Response は「応答する・返事する」という意味だよ。",
+        hint3: "行くのがリクエスト、帰ってくるのがレスポンス！",
+        afterNote: "リクエスト（お願い）→ レスポンス（返事）。この1往復のキャッチボールこそがWebの心臓部です！"
+      },
+      {
+        id: "p-04",
+        stageId: "prologue",
+        title: "まるもちSQLはどこが特別？",
+        subtitle: "サーバーなしで動く例のふりかえり",
+        slides: [
+          {
+            title: "ブラウザの中でぜんぶ完結していた！？",
+            body: "以前学んだ「まるもちSQL」などのドリルは、実はインターネットでサーバーと通信せず、あなたのブラウザの中だけで動いていました（WebAssembly技術など）。",
+            figureHtml: `
+              <div class="diag-flow">
+                <div class="diag-box highlight">📱 スマホ（ブラウザ）<br><small>画面もSQLの計算も全部ここで実行！</small></div>
+                <div class="diag-arrow">（通信なし）</div>
+                <div class="diag-box" style="opacity:0.4;">🏢 サーバー（未使用）</div>
+              </div>
+            `
+          },
+          {
+            title: "本物のWebアプリとの違い",
+            body: "本物のショッピングサイトでは、世界中の人が同時に注文します。だから「みんなが集まるサーバー」と通信して、在庫や注文を共有する必要があるのです！",
+            figureHtml: `
+              <div class="diag-flow">
+                <div class="diag-box">まるもち 🍡</div>
+                <div class="diag-arrow">➡️ ネット ➡️</div>
+                <div class="diag-box highlight">共有サーバー 🏢<br><small>みんなの注文が集まる！</small></div>
+                <div class="diag-arrow">⬅️ ネット ⬅️</div>
+                <div class="diag-box">お友達 🐱</div>
+              </div>
+            `
+          }
+        ],
+        example: {
+          scene: "飛行機の中で機内モード（通信オフ）にしても動くアプリ",
+          answer: "端末（ブラウザ）の中だけで完結しているアプリ",
+          reason: "外部のサーバーにリクエストを送る必要がないため、電波がなくても動きます。"
+        },
+        problems: [
+          {
+            id: "p-04-1",
+            scene: "電波の届かないオフライン環境でも、ブラウザ完結型の学習アプリが動く理由は？",
+            question: "次のうち、もっとも正しい理由はどれでしょう？",
+            type: "choice",
+            choices: [
+              "遠くのサーバーに頼らず、ブラウザの中だけで計算や処理を行っているから",
+              "宇宙の衛星と見えない電波で自動的につながっているから",
+              "サーバーがスマホの中に勝手に引っ越してきたから"
+            ],
+            answer: "遠くのサーバーに頼らず、ブラウザの中だけで計算や処理を行っているから",
+            feedback: "大正解！ブラウザだけで計算や保存を完結させているアプリは、サーバー通信なしで動きます。"
+          },
+          {
+            id: "p-04-2",
+            scene: "まるもちのショップで「残り在庫あと1個！」のスタンプを他の人に買われたら、あなたの画面でも売り切れになります。",
+            question: "このように全員で最新の注文状況を共有できるのはなぜ？",
+            type: "choice",
+            choices: [
+              "みんなが同じ「サーバー」と通信してデータをやり取りしているから",
+              "みんなのスマホ同士が直接Bluetoothで繋がっているから",
+              "スマホが予知能力を持っているから"
+            ],
+            answer: "みんなが同じ「サーバー」と通信してデータをやり取りしているから",
+            feedback: "パーフェクト！中央のサーバーが最新データを管理し、全員に配ってくれるから共有できるのです。"
+          }
+        ],
+        hint1: "外部と通信しているか、手元の端末の中だけで動いているかの違いを考えてみよう。",
+        hint2: "共有できるのは、みんなが同じ「中央の場所」を見に行っているからだよ。",
+        hint3: "答えは「みんなが同じサーバーと通信してデータを共有しているから」！",
+        afterNote: "一人で完結するアプリと、サーバーを介して世界とつながるWebアプリ。Webの醍醐味は「サーバーとの通信」にあります！"
+      },
+      {
+        id: "p-05",
+        stageId: "prologue",
+        title: "このドリルの進み方",
+        subtitle: "場面→判断の問題形式に慣れる",
+        slides: [
+          {
+            title: "暗記ではなく「場面と判断」で学ぶ！",
+            body: "このドリルでは、難しい英単語を丸暗記しません。「まるもちが注文を作りたい！」「まるもちは注文番号5を見たい！」という場面を想像して、どんな通信をすればいいかを判断します。",
+            figureHtml: `
+              <div class="diag-flow">
+                <div class="diag-box">1. 場面を見る<br><small>例: 注文を1件見たい</small></div>
+                <div class="diag-arrow">➡️</div>
+                <div class="diag-box highlight">2. 判断する<br><small>GET /orders/5 だ！</small></div>
+              </div>
+            `
+          },
+          {
+            title: "入力サポートとヒントがあるから安心！",
+            body: "入力問題では、キーボードで打たなくても下のボタンをポチッと押すだけで文字が入ります。間違えても何度でもやり直せるので、安心して挑戦してくださいね！",
+            figureHtml: `
+              <div class="diag-flow">
+                <div class="diag-box">💡 3段階ヒント</div>
+                <div class="diag-box">🔘 挿入ボタン</div>
+                <div class="diag-box">🔄 何度でも挑戦</div>
+              </div>
+            `
+          }
+        ],
+        example: {
+          scene: "【場面】注文番号5のデータを見たいとき",
+          answer: "注文番号5を取得するリクエストを送る",
+          reason: "やりたいことに合わせて、適切な「お願いの方法」を選ぶのがWebエンジニアの第一歩です。"
+        },
+        problems: [
+          {
+            id: "p-05-1",
+            scene: "これからのステージでWebの仕組みを学ぶにあたって、もっとも大切な考え方は？",
+            question: "次のうち、このドリルのゴールとしてぴったりなものはどれ？",
+            type: "choice",
+            choices: [
+              "「どんな場面で、ブラウザとサーバーがどんな通信をするか」を理解すること",
+              "英単語のスペルを100回ノートに書いて丸暗記すること",
+              "スマホの画面をできるだけ早く連打すること"
+            ],
+            answer: "「どんな場面で、ブラウザとサーバーがどんな通信をするか」を理解すること",
+            feedback: "バッチリです！「場面→判断」の感覚を身につけることが、何よりの実力になります！"
+          },
+          {
+            id: "p-05-2",
+            scene: "もし問題に間違えてしまったら、このドリルではどうなる？",
+            question: "安心して学習を続けられる理由はどれ？",
+            type: "choice",
+            choices: [
+              "解説とヒントを読んで、レッスンの最後にもう一度解いて定着できる",
+              "最初から全部やり直しになってデータが消える",
+              "怒られてゲームオーバーになる"
+            ],
+            answer: "解説とヒントを読んで、レッスンの最後にもう一度解いて定着できる",
+            feedback: "その通り！間違えた問題は最後に復習としてもう一度登場するので、確実に身につきます！"
+          }
+        ],
+        hint1: "丸暗記よりも、仕組みのイメージを掴むことが大切だよ。",
+        hint2: "間違えても大丈夫！いつでもやり直せる親切設計です。",
+        hint3: "答えは「どんな場面でどんな通信をするかを理解すること」！",
+        afterNote: "プロローグクリアおめでとう！これでWebの世界への準備運動はバッチリ。いよいよStage 0へ進もう！"
+      },
+
+      // ------------------------------------------------------------------------
+      // Stage 0: Webの基本の流れ 6レッスン (s0-01 〜 s0-06)
+      // ------------------------------------------------------------------------
+      {
+        id: "s0-01",
+        stageId: "stage0",
+        title: "URLの読み方",
+        subtitle: "ドメイン・パス・クエリの分解",
+        slides: [
+          {
+            title: "URLはインターネットの「住所」",
+            body: "ブラウザのアドレスバーに入力するURLは、インターネット上の「どこの・どの情報か」をピンポイントで示す住所です。",
+            figureHtml: `
+              <div class="diag-flow" style="font-size:0.9rem;">
+                <span style="color:#C2410C; font-weight:700;">https://</span>
+                <span style="color:#2563EB; font-weight:700;">shop.marumochi.com</span>
+                <span style="color:#16A34A; font-weight:700;">/orders/5</span>
+              </div>
+            `
+          },
+          {
+            title: "3つのパーツに分解してみよう",
+            body: "① スキーム（https://＝通信の方法）\n② ホスト/ドメイン（shop.marumochi.com＝どのサーバーか）\n③ パス（/orders/5＝そのサーバーの中のどのデータか）",
+            figureHtml: `
+              <div class="diag-flow" style="flex-direction:column; align-items:flex-start; gap:4px; font-size:0.88rem;">
+                <div>🔒 <b>スキーム:</b> 通信のルール（https）</div>
+                <div>🏢 <b>ドメイン:</b> サーバーの場所（marumochi.com）</div>
+                <div>📂 <b>パス:</b> 欲しい情報のありか（/orders/5）</div>
+              </div>
+            `
+          }
+        ],
+        example: {
+          scene: "URL「https://shop.marumochi.com/orders/5」から情報の場所を取り出す",
+          answer: "/orders/5",
+          reason: "ドメイン名以降の「/」から始まる部分が、欲しいデータを特定する「パス（Path）」です。"
+        },
+        problems: [
+          {
+            id: "s0-01-1",
+            scene: "ブラウザで「https://marumochi.com/stamps/12」を開きました。",
+            question: "このURLの中で、サーバー内の情報の場所を示す「パス」はどれ？",
+            type: "choice",
+            choices: [
+              "/stamps/12",
+              "marumochi.com",
+              "https://"
+            ],
+            answer: "/stamps/12",
+            feedback: "正解！ドメインの後ろにある「/stamps/12」がパスです。スタンプ番号12を指定しています！"
+          },
+          {
+            id: "s0-01-2",
+            scene: "まるもちショップのサーバー（shop.marumochi.com）にある「注文番号5」のデータを取り出したいです。",
+            question: "情報の場所を指定するパス（/から始まる文字列）を入力してください。",
+            type: "input",
+            answer: "/orders/5",
+            feedback: "素晴らしい！「/orders/5」で注文番号5の場所を正確に指し示すことができます！"
+          }
+        ],
+        hint1: "ドメイン名（marumochi.comなど）のすぐ後ろに続くスラッシュを探そう。",
+        hint2: "注文を表す英語は orders だよ。下の挿入ボタンを使ってみよう！",
+        hint3: "答えは「/orders/5」です！",
+        afterNote: "ドメイン（誰に）＋パス（何を）。URLを分解して読めるようになると、Web通信がぐっと理解しやすくなります！"
+      },
+      {
+        id: "s0-02",
+        stageId: "stage0",
+        title: "DNS解決",
+        subtitle: "名前から住所を引く電話帳",
+        slides: [
+          {
+            title: "コンピューターは英語が読めない！？",
+            body: "人間は「marumochi.com」という名前で覚えますが、コンピューター同士は「198.51.100.1」という数字の住所（IPアドレス）でしか通信できません。",
+            figureHtml: `
+              <div class="diag-flow">
+                <div class="diag-box">marumochi.com<br><small>（人間のための名前）</small></div>
+                <div class="diag-arrow">❓</div>
+                <div class="diag-box">198.51.100.1<br><small>（IPアドレス：本当の住所）</small></div>
+              </div>
+            `
+          },
+          {
+            title: "電話帳の役割をする「DNS」",
+            body: "ドメイン名をIPアドレスに翻訳してくれる案内人が『DNS（Domain Name System）』です。ブラウザは接続する前に、まずDNSに「住所教えて！」と聞きに行きます。",
+            figureHtml: `
+              <div class="diag-flow">
+                <div class="diag-box">📱 ブラウザ</div>
+                <div class="diag-arrow">➡️ 「marumochi.comのIPは？」 ➡️<br>⬅️ 「198.51.100.1だよ！」 ⬅️</div>
+                <div class="diag-box highlight">📖 DNSサーバー<br><small>（ネットの電話帳）</small></div>
+              </div>
+            `
+          }
+        ],
+        example: {
+          scene: "友達の家に行きたいけど名前しか分からないので、電話帳で住所を調べる場面",
+          answer: "DNS（ドメインネームシステム）の仕組み",
+          reason: "人間が使うドメイン名から、コンピューターが使うIPアドレスを逆引きする電話帳の役割です。"
+        },
+        problems: [
+          {
+            id: "s0-02-1",
+            scene: "あなたがブラウザに「marumochi.com」と入力しました。",
+            question: "DNSサーバー（Domain Name System）のお仕事を身近なもので例えるとどれ？",
+            type: "choice",
+            choices: [
+              "名前から電話番号や住所を引く「電話帳」",
+              "荷物を届ける「トラック」",
+              "部屋の鍵を開ける「合い鍵」"
+            ],
+            answer: "名前から電話番号や住所を引く「電話帳」",
+            feedback: "ピンポン！ドメイン名という「名前」からIPアドレスという「住所」を調べてくれる電話帳です！"
+          },
+          {
+            id: "s0-02-2",
+            scene: "ブラウザがまるもちサーバーに接続しようとしています。",
+            question: "実際にサーバーへリクエストを送る前に、ブラウザが最初に行うステップはどれ？",
+            type: "choice",
+            choices: [
+              "DNSサーバーに問い合わせて、サーバーのIPアドレスを調べる",
+              "いきなり注文データを送信してみる",
+              "スマホの電源を再起動する"
+            ],
+            answer: "DNSサーバーに問い合わせて、サーバーのIPアドレスを調べる",
+            feedback: "お見事！住所が分からないと手紙を送れないので、まずDNSでIPアドレスを解決します！"
+          }
+        ],
+        hint1: "相手のIPアドレス（数字の住所）を知らないと手紙を出せないよ。",
+        hint2: "ドメイン名とIPアドレスを変換してくれる仕組みを思い出してね。",
+        hint3: "答えは「電話帳」と「DNSサーバーにIPアドレスを問い合わせる」！",
+        afterNote: "DNSのおかげで、私たちはややこしい数字のIPアドレスを覚えずに「marumochi.com」でアクセスできるのです！"
+      },
+      {
+        id: "s0-03",
+        stageId: "stage0",
+        title: "接続と暗号化",
+        subtitle: "HTTPS・TLSの鍵交換のイメージ",
+        slides: [
+          {
+            title: "通信が丸見えだと危ない！",
+            body: "昔のWeb（HTTP）は、手紙をハガキのまま送るようなものでした。途中のWi-Fiや回線で、悪意のある人にパスワードやクレジットカード番号を盗み見られる危険がありました。",
+            figureHtml: `
+              <div class="diag-flow">
+                <div class="diag-box">📱 スマホ</div>
+                <div class="diag-arrow">➡️ パスワード丸見え！ ➡️</div>
+                <div class="diag-box" style="border-color:#EF4444;">😈 盗聴者</div>
+              </div>
+            `
+          },
+          {
+            title: "カギをかけて送る「HTTPS」",
+            body: "現在の標準である『HTTPS』では、通信を暗号のカプセルに入れます。ブラウザとサーバーが秘密の鍵を交換（TLSハンドシェイク）し、途中の人には絶対に読めない暗号文にして届きます！",
+            figureHtml: `
+              <div class="diag-flow">
+                <div class="diag-box">📱 暗号化 🔐</div>
+                <div class="diag-arrow">➡️ 読めない暗号データ ➡️</div>
+                <div class="diag-box highlight">🏢 複合化 🔓</div>
+              </div>
+            `
+          }
+        ],
+        example: {
+          scene: "パスワードを頑丈な金庫に入れて鍵をかけ、受取人だけが開けられるようにして送る",
+          answer: "HTTPS（TLSによる通信の暗号化）",
+          reason: "HTTPS通信では、ブラウザとサーバーの間で鍵を取り交わし、データを盗み見から守ります。"
+        },
+        problems: [
+          {
+            id: "s0-03-1",
+            scene: "URLの先頭にある「http://」と「https://」を見比べました。",
+            question: "httpsの末尾についている「s」の最大の意味は何でしょう？",
+            type: "choice",
+            choices: [
+              "Secure（通信が暗号化されていて安全であること）",
+              "Speed（通信速度が2倍速いこと）",
+              "Super（特別な機能がついていること）"
+            ],
+            answer: "Secure（通信が暗号化されていて安全であること）",
+            feedback: "その通り！Secureの「s」です。暗号化によって途中の盗み見やデータの改ざんを防ぎます。"
+          },
+          {
+            id: "s0-03-2",
+            scene: "カフェのフリーWi-Fiで、まるもちが「http://」（sなし）のサイトにパスワードを入力しようとしています。",
+            question: "このとき起こりうる危険として正しいものはどれ？",
+            type: "choice",
+            choices: [
+              "通信が暗号化されていないため、同じWi-Fiを使っている人にパスワードを盗み見られる危険がある",
+              "スマホのバッテリーが一瞬でゼロになってしまう",
+              "Wi-Fiの電波がオレンジ色に光りだす"
+            ],
+            answer: "通信が暗号化されていないため、同じWi-Fiを使っている人にパスワードを盗み見られる危険がある",
+            feedback: "大正解！http://（暗号化なし）の通信は丸見えなので、大切な情報を入れてはいけません！"
+          }
+        ],
+        hint1: "httpsの「s」は英語の安全（Secure）を表しているよ。",
+        hint2: "暗号化されていない通信は、ハガキにパスワードを書いて送るようなものだよ。",
+        hint3: "答えは「Secure（暗号化で安全）」です！",
+        afterNote: "現代のWebではHTTPSが当たり前！鍵を交換して安全なトンネルを作ってからデータをやりとりします。"
+      },
+      {
+        id: "s0-04",
+        stageId: "stage0",
+        title: "HTTPリクエストの中身",
+        subtitle: "メソッド＋ヘッダー＋本文の3層構造",
+        slides: [
+          {
+            title: "リクエストの手紙は「3階建て」",
+            body: "ブラウザがサーバーに送るリクエストの手紙の中身を見てみましょう。実はきれいに3つのブロックに分かれています。",
+            figureHtml: `
+              <div class="diag-flow" style="flex-direction:column; align-items:stretch; gap:6px; font-size:0.9rem;">
+                <div class="diag-box highlight">1階: リクエスト行（GET /orders/5 HTTP/1.1）</div>
+                <div class="diag-box">2階: ヘッダー（ブラウザの種類や言語設定）</div>
+                <div class="diag-box" style="background:#F3F4F6;">3階: ボディ（送信するデータ本体・空の場合もある）</div>
+              </div>
+            `
+          },
+          {
+            title: "いちばん大事な「メソッド」と「パス」",
+            body: "手紙の1行目には「何をしてほしいか（HTTPメソッド）」と「どの情報か（パス）」が書かれます。データを取得したいときは『GET』を使います！",
+            figureHtml: `
+              <div class="diag-flow">
+                <div class="diag-box highlight">GET<br><small>（取ってきて！）</small></div>
+                <div class="diag-arrow">＋</div>
+                <div class="diag-box highlight">/orders/5<br><small>（注文番号5のデータを）</small></div>
+              </div>
+            `
+          }
+        ],
+        example: {
+          scene: "サーバーにある注文番号5のデータを見たい（取得したい）ときのリクエスト行",
+          answer: "GET /orders/5",
+          reason: "情報を取得するメソッド「GET」と、情報の場所「/orders/5」を半角スペースで繋ぎます。"
+        },
+        problems: [
+          {
+            id: "s0-04-1",
+            scene: "HTTPリクエストの手紙の構造を調べています。",
+            question: "リクエストの手紙を構成する主要な要素に含まれないものはどれ？",
+            type: "choice",
+            choices: [
+              "ステータスコード（200 OK など：これはサーバーからの返事のもの）",
+              "リクエスト行（GETなどのメソッドとパス）",
+              "リクエストヘッダー（ブラウザの情報など）",
+              "リクエストボディ（新規作成時に送るデータなど）"
+            ],
+            answer: "ステータスコード（200 OK など：これはサーバーからの返事のもの）",
+            feedback: "素晴らしい！ステータスコードは「サーバーからの返事（レスポンス）」に含まれるものです！"
+          },
+          {
+            id: "s0-04-2",
+            scene: "まるもちが「注文番号5の注文データを画面に表示したい」と考えています。",
+            question: "サーバーからデータを取得するためのリクエスト（メソッドとパス）を入力してください。",
+            type: "input_method_url",
+            expectedMethod: "GET",
+            expectedUrl: "/orders/5",
+            answer: "GET /orders/5",
+            feedback: "完璧です！「GET /orders/5」で、サーバーに注文番号5のデータをちょうだい！と頼めます。"
+          }
+        ],
+        hint1: "データを持ってきてほしいときは「GET」を使うよ。",
+        hint2: "注文番号5のパスは「/orders/5」だよ。下の挿入ボタンを使ってみてね！",
+        hint3: "答えは「GET /orders/5」です！",
+        afterNote: "「GET /orders/5」のように、メソッドとパスを組み合わせるだけでサーバーへの明確なお願いになります！"
+      },
+      {
+        id: "s0-05",
+        stageId: "stage0",
+        title: "HTTPレスポンスの中身",
+        subtitle: "ステータスコード＋本文の3層構造",
+        slides: [
+          {
+            title: "返事の手紙も「3階建て」",
+            body: "サーバーから戻ってくるレスポンスの手紙も、リクエストと同じく3つのブロックに分かれています。",
+            figureHtml: `
+              <div class="diag-flow" style="flex-direction:column; align-items:stretch; gap:6px; font-size:0.9rem;">
+                <div class="diag-box highlight">1階: ステータス行（HTTP/1.1 200 OK）</div>
+                <div class="diag-box">2階: ヘッダー（データの形式 Content-Type: application/json）</div>
+                <div class="diag-box" style="background:#F3F4F6;">3階: ボディ（実際の注文データなど）</div>
+              </div>
+            `
+          },
+          {
+            title: "結果を3桁の数字で伝える「ステータスコード」",
+            body: "サーバーは「成功したよ！」「見つからなかったよ」という結果を、まず3桁の数字で伝えます。200は「大成功」、404は「見つからない」です！",
+            figureHtml: `
+              <div class="diag-flow">
+                <div class="diag-box" style="border-color:#16A34A; color:#16A34A;">🟢 200 OK<br><small>リクエスト成功！</small></div>
+                <div class="diag-box" style="border-color:#DC2626; color:#DC2626;">🔴 404 Not Found<br><small>データがないよ！</small></div>
+              </div>
+            `
+          }
+        ],
+        example: {
+          scene: "注文番号5のデータが無事に見つかり、正常にデータを返せるとき",
+          answer: "200 OK",
+          reason: "リクエストが正しく受け付けられ、正常に処理されたことを表す代表的なステータスコードです。"
+        },
+        problems: [
+          {
+            id: "s0-05-1",
+            scene: "サーバーから返ってきた返事の1行目に「200 OK」と書かれていました。",
+            question: "この3桁の数字「200」が表す意味として正しいものはどれ？",
+            type: "choice",
+            choices: [
+              "リクエストが成功して、正常に処理できた",
+              "データが見つからずエラーになった",
+              "サーバーのコンピューターが故障した"
+            ],
+            answer: "リクエストが成功して、正常に処理できた",
+            feedback: "大正解！200番台は「成功」の合図です。200 OK はWebで一番嬉しい返事ですね！"
+          },
+          {
+            id: "s0-05-2",
+            scene: "まるもちが探している注文番号9999が存在しなかったとき、サーバーが返す有名な3桁のステータス番号は？",
+            question: "「見つかりません（Not Found）」を意味する3桁の番号を入力してください。",
+            type: "input",
+            answer: "404",
+            feedback: "ピンポン！Webで最も有名な番号「404」Not Found です！下のボタンからも入力できますね。"
+          }
+        ],
+        hint1: "200番台は成功、400番台は見つからないなどの失敗を表すよ。",
+        hint2: "ページが見つからないときによく画面に出る3桁の数字だよ。",
+        hint3: "答えは「404」です！",
+        afterNote: "200（成功）、404（見つからない）。数字を見るだけで通信の結果が一目で分かるのがステータスコードの便利さです！"
+      },
+      {
+        id: "s0-06",
+        stageId: "stage0",
+        title: "アクセスから表示までの8ステップ",
+        subtitle: "Webの全貌を1本のストーリーで確認！",
+        slides: [
+          {
+            title: "あなたがEnterを押した瞬間、何が起きている？",
+            body: "URLを入力してから画面に可愛いまるもちが表示されるまで、実は裏で8つのステップが電光石火のスピードで動いています。",
+            figureHtml: `
+              <div class="diag-flow" style="flex-direction:column; align-items:flex-start; gap:4px; font-size:0.85rem;">
+                <div>① URL入力 ⌨️ ➡️ ② DNSでIP調査 📖</div>
+                <div>③ 暗号化接続（TLS） 🔐 ➡️ ④ リクエスト送信 📤</div>
+                <div>⑤ サーバー処理 ⚙️ ➡️ ⑥ レスポンス返信 📥</div>
+                <div>⑦ データ解析 🔍 ➡️ ⑧ 画面描画（完成！） 🎨</div>
+              </div>
+            `
+          },
+          {
+            title: "すべては「準備」と「1往復」と「描画」",
+            body: "大きく分けると「相手を探して安全に繋ぐ準備（①〜③）」→「お願いと返事の1往復（④〜⑥）」→「手元のブラウザが絵を描く（⑦〜⑧）」の3部構成です！",
+            figureHtml: `
+              <div class="diag-flow">
+                <div class="diag-box">準備<br><small>DNS / 接続</small></div>
+                <div class="diag-arrow">➡️</div>
+                <div class="diag-box highlight">通信<br><small>Req / Res</small></div>
+                <div class="diag-arrow">➡️</div>
+                <div class="diag-box">描画<br><small>画面表示</small></div>
+              </div>
+            `
+          }
+        ],
+        example: {
+          scene: "まるもちショップのURLを押してから画面が出るまでの全体の流れ",
+          answer: "DNS解決 → 暗号化接続 → リクエスト送信 → レスポンス受信 → 画面描画",
+          reason: "相手の住所を調べて接続し、手紙の1往復を交わした後に、ブラウザが画面を描き上げます。"
+        },
+        problems: [
+          {
+            id: "s0-06-1",
+            scene: "ブラウザでURLを入力したあと、サーバーにHTTPリクエストを送信する「前」に行われる準備はどれ？",
+            question: "正しい順番になっているものを選んでください。",
+            type: "choice",
+            choices: [
+              "DNSでサーバーのIPアドレスを調べ、暗号化接続（TLS）を確立する",
+              "先に画面を描画してから、後で接続先を探す",
+              "ステータスコード200をブラウザが自分で発行する"
+            ],
+            answer: "DNSでサーバーのIPアドレスを調べ、暗号化接続（TLS）を確立する",
+            feedback: "その通り！まず相手の住所（IP）をDNSで引き、安全な通信トンネルを開通させてからリクエストを送ります。"
+          },
+          {
+            id: "s0-06-2",
+            scene: "サーバーから注文データのレスポンス（200 OK と HTML/JSON）を受け取りました。",
+            question: "この直後、ブラウザが最後に行うステップ（仕上げ）はどれ？",
+            type: "choice",
+            choices: [
+              "受け取ったデータを解析して、人間の目に見える画面に描画（レンダリング）する",
+              "DNSサーバーの電話帳を全部消去する",
+              "もう一度同じリクエストを意味なく送り直す"
+            ],
+            answer: "受け取ったデータを解析して、人間の目に見える画面に描画（レンダリング）する",
+            feedback: "パーフェクト！受け取ったデータを解析して、綺麗なボタンや文字として画面に描く（レンダリング）ことで完了します！"
+          }
+        ],
+        hint1: "手紙を送るには相手の住所と安全な道が必要だよ。",
+        hint2: "最後にあなたのスマホで目に見えるようにする作業を思い出してね。",
+        hint3: "答えは「DNS調査と暗号化接続」そして最後に「画面描画（レンダリング）」です！",
+        afterNote: "おめでとうございます！Stage 0クリア！Webアクセスの全体像が1本の線でつながりましたね。あなたはもうWebの仕組み通です！"
+      }
+    ];
+
+    // --- アプリケーションの状態管理 ---
+    const STORAGE_KEY = "web_marumochi_progress_v1";
+
+    const AppState = {
+      progress: {
+        completed: [],         // 完了したレッスンID
+        celebratedStages: [],  // お祝い表示済みのステージID
+        celebratedAll: false   // 全完了お祝い表示済みフラグ
+      },
+      currentLesson: null,
+      currentSlideIndex: 0,
+      currentProblemIndex: 0,
+      problemQueue: [],        // 間違えた問題が末尾に追加されるキュー
+      selectedChoice: null,
+      currentHintLevel: 0,
+      mistakesInCurrentLesson: new Set()
+    };
+
+    // --- アプリケーション本体 ---
+    const App = {
+      init() {
+        this.loadProgress();
+        this.renderStages();
+        this.updateGlobalBadge();
+      },
+
+      // LocalStorage管理
+      loadProgress() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (raw) {
+            const data = JSON.parse(raw);
+            AppState.progress.completed = Array.isArray(data.completed) ? data.completed : [];
+            AppState.progress.celebratedStages = Array.isArray(data.celebratedStages) ? data.celebratedStages : [];
+            AppState.progress.celebratedAll = !!data.celebratedAll;
+          }
+        } catch (e) {
+          console.error("Progress load error", e);
+        }
+      },
+
+      saveProgress() {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(AppState.progress));
+        } catch (e) {
+          console.error("Progress save error", e);
+        }
+      },
+
+      resetProgress() {
+        if (!confirm("これまでの進捗をリセットして最初からやり直しますか？")) return;
+        AppState.progress = {
+          completed: [],
+          celebratedStages: [],
+          celebratedAll: false
+        };
+        this.saveProgress();
+        this.renderStages();
+        this.updateGlobalBadge();
+        this.showMochiMessage("進捗をリセットしたよ！いつでも何度でも気軽に挑戦してね 🍡");
+      },
+
+      updateGlobalBadge() {
+        const totalImplemented = LESSONS_DATA.length; // 実装済みレッスン総数を動的に計算
+        const doneCount = AppState.progress.completed.length;
+        document.getElementById("globalProgressBadge").textContent = `進捗 ${doneCount} / ${totalImplemented}`;
+
+        const percent = Math.min(100, Math.round((doneCount / totalImplemented) * 100)) || 0;
+        document.getElementById("homeProgressBar").style.width = percent + "%";
+        document.getElementById("homeProgressPercent").textContent = `達成率 ${percent}% (${doneCount}/${totalImplemented} 完了)`;
+      },
+
+      showMochiMessage(text, face = "🍡") {
+        document.getElementById("marumochiText").textContent = text;
+        document.getElementById("mochiFace").textContent = face;
+      },
+
+      // トップ画面のステージ一覧描画
+      renderStages() {
+        const container = document.getElementById("stagesContainer");
+        container.innerHTML = "";
+
+        STAGES_DATA.forEach(stage => {
+          const stageEl = document.createElement("div");
+          stageEl.className = "stage-section";
+
+          // ステージヘッダー
+          let badgeHtml = "";
+          if (stage.status === "locked") {
+            badgeHtml = `<span class="badge-locked">近日公開</span>`;
+          } else {
+            const stageLessons = LESSONS_DATA.filter(l => l.stageId === stage.id);
+            const stageDoneCount = stageLessons.filter(l => AppState.progress.completed.includes(l.id)).length;
+            const isStageAllDone = stageLessons.length > 0 && stageDoneCount === stageLessons.length;
+            badgeHtml = `<span style="font-size:0.8rem; font-weight:700; color:${isStageAllDone ? 'var(--success)' : 'var(--primary)'}">
+              ${isStageAllDone ? '✨ 完全制覇！' : `${stageDoneCount} / ${stageLessons.length} 完了`}
+            </span>`;
+          }
+
+          stageEl.innerHTML = `
+            <div class="stage-header">
+              <div class="stage-title">${stage.title}</div>
+              ${badgeHtml}
+            </div>
+            <div class="stage-desc">${stage.desc}</div>
+            <div class="lesson-grid" id="grid-${stage.id}"></div>
+          `;
+          container.appendChild(stageEl);
+
+          const grid = stageEl.querySelector(`#grid-${stage.id}`);
+
+          if (stage.status === "locked") {
+            const lockedItem = document.createElement("div");
+            lockedItem.className = "lesson-item stage-locked";
+            lockedItem.innerHTML = `
+              <div class="lesson-info">
+                <div class="lesson-title-text" style="color:#78716C;">準備中のお楽しみステージ</div>
+                <div class="lesson-sub">Stage 0 をクリアして待っていてね！</div>
+              </div>
+              <div class="lesson-status-icon">🔒</div>
+            `;
+            grid.appendChild(lockedItem);
+            return;
+          }
+
+          // レッスン一覧描画
+          const lessons = LESSONS_DATA.filter(l => l.stageId === stage.id);
+          lessons.forEach(lesson => {
+            const isCompleted = AppState.progress.completed.includes(lesson.id);
+            const item = document.createElement("div");
+            item.className = `lesson-item ${isCompleted ? 'completed' : ''}`;
+            item.onclick = () => App.startLesson(lesson.id);
+
+            item.innerHTML = `
+              <div class="lesson-info">
+                <span class="lesson-code">${lesson.id}</span>
+                <div class="lesson-title-text">${lesson.title}</div>
+                <div class="lesson-sub">${lesson.subtitle}</div>
+              </div>
+              <div class="lesson-status-icon">${isCompleted ? '✅' : '👉'}</div>
+            `;
+            grid.appendChild(item);
+          });
+        });
+      },
+
+      goHome() {
+        document.getElementById("viewLesson").classList.add("hidden");
+        document.getElementById("viewHome").classList.remove("hidden");
+        this.renderStages();
+        this.updateGlobalBadge();
+        window.scrollTo(0, 0);
+        this.showMochiMessage("ステージ地図に戻ってきたよ！次は何を学ぼうか？ 🍡");
+      },
+
+      // レッスン開始
+      startLesson(lessonId) {
+        const lesson = LESSONS_DATA.find(l => l.id === lessonId);
+        if (!lesson) return;
+
+        AppState.currentLesson = lesson;
+        AppState.currentSlideIndex = 0;
+        AppState.currentHintLevel = 0;
+        AppState.mistakesInCurrentLesson.clear();
+        AppState.selectedChoice = null;
+
+        // 問題キューの初期化（shallow copy）
+        AppState.problemQueue = [...lesson.problems];
+        AppState.currentProblemIndex = 0;
+
+        // 画面切り替え & 先頭にスクロール（自動フォーカスによるスクロールを防ぐ）
+        document.getElementById("viewHome").classList.add("hidden");
+        document.getElementById("viewLesson").classList.remove("hidden");
+        window.scrollTo(0, 0);
+
+        // 基本情報の表示
+        document.getElementById("lessonCodeBadge").textContent = lesson.id;
+        document.getElementById("lessonTitle").textContent = lesson.title;
+        document.getElementById("lessonSubtitle").textContent = lesson.subtitle;
+
+        // スライドの描画
+        this.renderSlide();
+
+        // 完成例（worked-example）の描画
+        document.getElementById("exampleScene").textContent = `【場面】${lesson.example.scene}`;
+        document.getElementById("exampleAnswer").textContent = lesson.example.answer;
+        document.getElementById("exampleReason").textContent = `理由：${lesson.example.reason}`;
+
+        // まとめノートを隠す
+        document.getElementById("afterNoteCard").classList.add("hidden");
+        document.getElementById("problemCard").classList.remove("hidden");
+        document.getElementById("exampleCard").classList.remove("hidden");
+        document.getElementById("slidesWrapper").classList.remove("hidden");
+
+        // 演習問題の初期表示
+        this.renderCurrentProblem();
+
+        this.showMochiMessage(`「${lesson.title}」へようこそ！スライドと完成例を眺めてから、演習に挑戦しよう！`, "🍡");
+      },
+
+      // スライド操作
+      renderSlide() {
+        const lesson = AppState.currentLesson;
+        const slide = lesson.slides[AppState.currentSlideIndex];
+        const total = lesson.slides.length;
+
+        document.getElementById("slideNumberBadge").textContent = `スライド ${AppState.currentSlideIndex + 1} / ${total}`;
+        document.getElementById("slideTitle").textContent = slide.title;
+        document.getElementById("slideBody").textContent = slide.body;
+        document.getElementById("slideFigure").innerHTML = slide.figureHtml || "";
+
+        // ドットインジケーター
+        const dotsContainer = document.getElementById("slideDots");
+        dotsContainer.innerHTML = "";
+        for (let i = 0; i < total; i++) {
+          const dot = document.createElement("div");
+          dot.className = `dot ${i === AppState.currentSlideIndex ? 'active' : ''}`;
+          dotsContainer.appendChild(dot);
+        }
+
+        // 前へ・次へボタンの制御
+        document.getElementById("btnPrevSlide").disabled = (AppState.currentSlideIndex === 0);
+        const nextBtn = document.getElementById("btnNextSlide");
+        if (AppState.currentSlideIndex === total - 1) {
+          nextBtn.textContent = "演習へ ↓";
+        } else {
+          nextBtn.textContent = "次へ →";
+        }
+      },
+
+      prevSlide() {
+        if (AppState.currentSlideIndex > 0) {
+          AppState.currentSlideIndex--;
+          this.renderSlide();
+        }
+      },
+
+      nextSlide() {
+        const lesson = AppState.currentLesson;
+        if (AppState.currentSlideIndex < lesson.slides.length - 1) {
+          AppState.currentSlideIndex++;
+          this.renderSlide();
+        } else {
+          // 演習カードへスムーズに案内
+          const problemCard = document.getElementById("problemCard");
+          problemCard.scrollIntoView({ behavior: "smooth" });
+          this.showMochiMessage("さあ、完成例を参考にして演習問題を解いてみよう！応援してるよ！", "✊");
+        }
+      },
+
+      // 演習問題の描画
+      renderCurrentProblem() {
+        const problem = AppState.problemQueue[AppState.currentProblemIndex];
+        if (!problem) {
+          this.onAllProblemsCleared();
+          return;
+        }
+
+        // 進行度インジケーター
+        const originalTotal = AppState.currentLesson.problems.length;
+        const currentNum = Math.min(AppState.currentProblemIndex + 1, originalTotal);
+        const isRechallenge = AppState.mistakesInCurrentLesson.has(problem.id);
+        
+        document.getElementById("lessonStepIndicator").textContent = `問題 ${currentNum} / ${originalTotal}${isRechallenge ? ' (再挑戦)' : ''}`;
+        document.getElementById("problemTag").textContent = isRechallenge ? "🔄 もう一度挑戦！" : `演習 ${currentNum}`;
+        document.getElementById("problemFormatBadge").textContent = (problem.type === "choice") ? "選択問題" : "入力問題";
+
+        document.getElementById("problemScene").textContent = problem.scene;
+        document.getElementById("problemQuestion").textContent = problem.question;
+
+        // UIリセット
+        AppState.selectedChoice = null;
+        document.getElementById("feedbackBox").style.display = "none";
+        document.getElementById("btnSubmitAnswer").disabled = false;
+        document.getElementById("btnSubmitAnswer").style.display = "block";
+
+        // ヒント初期化
+        AppState.currentHintLevel = 0;
+        document.getElementById("hintsListContainer").innerHTML = "";
+        document.getElementById("btnHintToggle").textContent = "💡 ヒントを見る（1/3）";
+
+        const choiceContainer = document.getElementById("choicesContainer");
+        const inputContainer = document.getElementById("inputContainer");
+        const textInput = document.getElementById("problemTextInput");
+
+        if (problem.type === "choice") {
+          choiceContainer.classList.remove("hidden");
+          inputContainer.classList.add("hidden");
+          choiceContainer.innerHTML = "";
+
+          problem.choices.forEach((choiceText, idx) => {
+            const btn = document.createElement("button");
+            btn.type = "button";
+            btn.className = "choice-btn";
+            btn.innerHTML = `
+              <span class="choice-key">${idx + 1}</span>
+              <span>${choiceText}</span>
+            `;
+            btn.onclick = () => {
+              AppState.selectedChoice = choiceText;
+              document.querySelectorAll(".choice-btn").forEach(b => b.classList.remove("selected"));
+              btn.classList.add("selected");
+            };
+            choiceContainer.appendChild(btn);
+          });
+        } else {
+          // 入力式（input または input_method_url）
+          choiceContainer.classList.add("hidden");
+          inputContainer.classList.remove("hidden");
+          textInput.value = "";
+          // 自動フォーカスはあえて行わず、スクロール位置を保護する
+        }
+      },
+
+      // クイック挿入チップボタン（カーソル位置に挿入）
+      insertChip(text) {
+        const input = document.getElementById("problemTextInput");
+        if (!input) return;
+
+        const start = input.selectionStart || 0;
+        const end = input.selectionEnd || 0;
+        const val = input.value;
+
+        // カーソル位置の前後に半角スペースをよしなに補完（空でなく直前に文字があり空白がない場合）
+        let insertText = text;
+        if (start > 0 && val[start - 1] !== " " && text.startsWith("/")) {
+          insertText = " " + text;
+        }
+
+        input.setRangeText(insertText, start, end, "end");
+        input.focus();
+      },
+
+      // 3段階ヒント
+      revealNextHint() {
+        const lesson = AppState.currentLesson;
+        const container = document.getElementById("hintsListContainer");
+        const toggleBtn = document.getElementById("btnHintToggle");
+
+        AppState.currentHintLevel++;
+        if (AppState.currentHintLevel === 1) {
+          const div = document.createElement("div");
+          div.className = "hint-step-box";
+          div.innerHTML = `<b>💡 ヒント 1:</b> ${lesson.hint1}`;
+          container.appendChild(div);
+          toggleBtn.textContent = "💡 もっとヒントを見る（2/3）";
+        } else if (AppState.currentHintLevel === 2) {
+          const div = document.createElement("div");
+          div.className = "hint-step-box";
+          div.innerHTML = `<b>💡 ヒント 2:</b> ${lesson.hint2}`;
+          container.appendChild(div);
+          toggleBtn.textContent = "💡 答えのヒントを見る（3/3）";
+        } else if (AppState.currentHintLevel >= 3) {
+          const div = document.createElement("div");
+          div.className = "hint-step-box";
+          div.style.background = "#FEF3C7";
+          div.style.borderColor = "#FCD34D";
+          div.innerHTML = `<b>💡 答えのヒント:</b> ${lesson.hint3}`;
+          container.appendChild(div);
+          toggleBtn.textContent = "💡 ヒントはすべて表示されました";
+          toggleBtn.disabled = true;
+        }
+      },
+
+      // 入力値の正規化ヘルパー
+      normalizeInput(str) {
+        if (!str) return "";
+        return str.trim()
+          .replace(/\/+$/, "") // 末尾のスラッシュを除去
+          .replace(/\s+/g, " "); // 連続空白を1つに
+      },
+
+      // 回答チェック
+      submitAnswer() {
+        const problem = AppState.problemQueue[AppState.currentProblemIndex];
+        const feedbackBox = document.getElementById("feedbackBox");
+        const feedbackHeader = document.getElementById("feedbackHeader");
+        const feedbackMsg = document.getElementById("feedbackMsg");
+        const btnSubmit = document.getElementById("btnSubmitAnswer");
+
+        let isCorrect = false;
+        let detailedMsg = "";
+
+        if (problem.type === "choice") {
+          if (!AppState.selectedChoice) {
+            alert("選択肢をタップして選んでね！");
+            return;
+          }
+          if (AppState.selectedChoice === problem.answer) {
+            isCorrect = true;
+            detailedMsg = problem.feedback;
+          } else {
+            isCorrect = false;
+            detailedMsg = "おしい！もう一度問題文と完成例を見直してみてね。ヒントボタンも使ってみよう！";
+          }
+        } else if (problem.type === "input_method_url") {
+          // メソッド＋URL判定（メソッドとURLを別々に判定し、どちらが違うか明示する）
+          const inputVal = document.getElementById("problemTextInput").value.trim();
+          if (!inputVal) {
+            alert("答えを入力してね！下のボタンをタップして挿入もできるよ。");
+            return;
+          }
+
+          const parts = inputVal.split(/\s+/);
+          const userMethod = (parts[0] || "").toUpperCase();
+          const userUrl = this.normalizeInput(parts.slice(1).join(""));
+
+          const expMethod = problem.expectedMethod.toUpperCase();
+          const expUrl = this.normalizeInput(problem.expectedUrl);
+
+          const isMethodMatch = (userMethod === expMethod);
+          const isUrlMatch = (userUrl === expUrl);
+
+          if (isMethodMatch && isUrlMatch) {
+            isCorrect = true;
+            detailedMsg = problem.feedback;
+          } else if (!isMethodMatch && isUrlMatch) {
+            isCorrect = false;
+            detailedMsg = `URL（${userUrl}）は合っていますが、メソッド名が違います！今回はデータを取得するので ${expMethod} を指定します。`;
+          } else if (isMethodMatch && !isUrlMatch) {
+            isCorrect = false;
+            detailedMsg = `メソッド（${userMethod}）は合っていますが、URLパスが違います！正解のパスは「${problem.expectedUrl}」です。`;
+          } else {
+            isCorrect = false;
+            detailedMsg = `メソッド名とURLの両方が違っています。「${problem.answer}」のように、メソッドとURLを半角スペースで区切って入力してみよう！`;
+          }
+        } else {
+          // 単体入力判定 (正規化して比較)
+          const inputVal = document.getElementById("problemTextInput").value;
+          if (!inputVal.trim()) {
+            alert("答えを入力してね！下のボタンをタップして挿入もできるよ。");
+            return;
+          }
+
+          const normUser = this.normalizeInput(inputVal).toUpperCase();
+          const normExp = this.normalizeInput(problem.answer).toUpperCase();
+
+          if (normUser === normExp) {
+            isCorrect = true;
+            detailedMsg = problem.feedback;
+          } else {
+            isCorrect = false;
+            detailedMsg = `入力された「${inputVal.trim()}」は少し違うようです。正解は「${problem.answer}」です。`;
+          }
+        }
+
+        // フィードバック表示
+        feedbackBox.style.display = "block";
+        btnSubmit.style.display = "none";
+
+        if (isCorrect) {
+          feedbackBox.className = "feedback-box correct";
+          feedbackHeader.innerHTML = "🎉 大正解！ピンポン！";
+          feedbackMsg.innerHTML = detailedMsg;
+          this.showMochiMessage("すごい！大正解だよ！この調子でどんどん進もう！", "😆");
+          document.getElementById("btnNextProblem").textContent = "次のステップへ進む →";
+        } else {
+          feedbackBox.className = "feedback-box incorrect";
+          feedbackHeader.innerHTML = "💡 おしい！あと一歩！";
+          feedbackMsg.innerHTML = detailedMsg;
+          this.showMochiMessage("どんまい！間違えた問題はレッスンの最後にもう一度挑戦できるよ！", "🤔");
+
+          // 間違えた問題を記録し、キューの末尾に追加（定着確認）
+          AppState.mistakesInCurrentLesson.add(problem.id);
+          AppState.problemQueue.push(problem);
+
+          document.getElementById("btnNextProblem").textContent = "解説を確認して次へ進む →";
+        }
+      },
+
+      // 次の問題へ
+      nextProblem() {
+        AppState.currentProblemIndex++;
+        this.renderCurrentProblem();
+      },
+
+      // レッスンの全問（再出題含む）クリア時
+      onAllProblemsCleared() {
+        const lesson = AppState.currentLesson;
+
+        // 進捗に追加（未完了だった場合）
+        if (!AppState.progress.completed.includes(lesson.id)) {
+          AppState.progress.completed.push(lesson.id);
+          this.saveProgress();
+          this.updateGlobalBadge();
+        }
+
+        // 演習カードと完成例を隠し、まとめノートを表示
+        document.getElementById("problemCard").classList.add("hidden");
+        document.getElementById("exampleCard").classList.add("hidden");
+        document.getElementById("slidesWrapper").classList.add("hidden");
+
+        const afterCard = document.getElementById("afterNoteCard");
+        afterCard.classList.remove("hidden");
+        document.getElementById("afterNoteBody").innerHTML = lesson.afterNote;
+
+        this.showMochiMessage("全問クリアおめでとう！しっかり定着できたね。まとめメモをチェックしよう！", "🎉");
+
+        // ステージクリアまたは全レッスンクリアのお祝いチェック
+        this.checkCelebrations(lesson.stageId);
+      },
+
+      // お祝いモーダル判定（各1回のみ、動的カウント）
+      checkCelebrations(stageId) {
+        const stage = STAGES_DATA.find(s => s.id === stageId);
+        const stageLessons = LESSONS_DATA.filter(l => l.stageId === stageId);
+        const stageAllCleared = stageLessons.length > 0 && stageLessons.every(l => AppState.progress.completed.includes(l.id));
+
+        const totalImplemented = LESSONS_DATA.length;
+        const allImplementedCleared = LESSONS_DATA.every(l => AppState.progress.completed.includes(l.id));
+
+        // 1. 全実装済みレッスン完全クリアチェック
+        if (allImplementedCleared && !AppState.progress.celebratedAll) {
+          AppState.progress.celebratedAll = true;
+          this.saveProgress();
+          this.showCelebrationModal(
+            "🏆 全レッスン完全制覇！",
+            `おめでとうございます！！実装済みの全 ${totalImplemented} レッスンをすべてクリアしました！Webの基礎（ブラウザとサーバー、HTTPリクエスト・レスポンス、URL・DNS・暗号化）をしっかりマスターしました！素晴らしい努力です！`,
+            "👑"
+          );
+          return;
+        }
+
+        // 2. ステージクリアチェック
+        if (stageAllCleared && !AppState.progress.celebratedStages.includes(stageId)) {
+          AppState.progress.celebratedStages.push(stageId);
+          this.saveProgress();
+          this.showCelebrationModal(
+            `🎉 ${stage.title} クリア！`,
+            `素晴らしい！「${stage.title}」のすべてのレッスンをコンプリートしました！Webの仕組みがどんどん手になじんできましたね！`,
+            "🌟"
+          );
+        }
+      },
+
+      showCelebrationModal(title, desc, emoji = "🎉") {
+        document.getElementById("modalTitle").textContent = title;
+        document.getElementById("modalDesc").textContent = desc;
+        document.getElementById("modalEmoji").textContent = emoji;
+        document.getElementById("celebrationModal").classList.remove("hidden");
+      },
+
+      closeModal() {
+        document.getElementById("celebrationModal").classList.add("hidden");
+      },
+
+      finishLesson() {
+        this.goHome();
+      }
+    };
+
+    // 起動
+    window.addEventListener("DOMContentLoaded", () => {
+      App.init();
+    });
+  </script>
+</body>
+</html>
