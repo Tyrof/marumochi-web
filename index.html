@@ -1864,7 +1864,7 @@
       },
 
       updateGlobalBadge() {
-        const totalImplemented = LESSONS_DATA.length; // 実装済みレッスン総数を動的に計算
+        const totalImplemented = LESSONS_DATA.length; // 全レッスン総数を動的に計算
         const doneCount = AppState.progress.completed.length;
         document.getElementById("globalProgressBadge").textContent = `進捗 ${doneCount} / ${totalImplemented}`;
 
@@ -2316,13 +2316,13 @@
         const totalImplemented = LESSONS_DATA.length;
         const allImplementedCleared = LESSONS_DATA.every(l => AppState.progress.completed.includes(l.id));
 
-        // 1. 全実装済みレッスン完全クリアチェック
+        // 1. 全レッスン完全クリアチェック
         if (allImplementedCleared && !AppState.progress.celebratedAll) {
           AppState.progress.celebratedAll = true;
           this.saveProgress();
           this.showCelebrationModal(
             "🏆 全レッスン完全制覇！",
-            `おめでとうございます！！実装済みの全 ${totalImplemented} レッスンをすべてクリアしました！Webの基礎（ブラウザとサーバー、HTTPリクエスト・レスポンス、URL・DNS・暗号化）をしっかりマスターしました！素晴らしい努力です！`,
+            `おめでとうございます！！全 ${totalImplemented} レッスンをすべてクリアしました！Webの基礎（ブラウザとサーバー、HTTPリクエスト・レスポンス、URL・DNS・暗号化）をしっかりマスターしました！素晴らしい努力です！`,
             "👑"
           );
           return;
