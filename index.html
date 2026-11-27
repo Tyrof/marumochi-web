@@ -926,8 +926,10 @@
                 <button type="button" class="chip-btn" onclick="App.insertChip('PUT')">PUT</button>
                 <button type="button" class="chip-btn" onclick="App.insertChip('PATCH')">PATCH</button>
                 <button type="button" class="chip-btn" onclick="App.insertChip('DELETE')">DELETE</button>
+                <button type="button" class="chip-btn" onclick="App.insertChip('/orders')">/orders</button>
                 <button type="button" class="chip-btn" onclick="App.insertChip('/orders/')">/orders/</button>
                 <button type="button" class="chip-btn" onclick="App.insertChip('/orders/5')">/orders/5</button>
+                <button type="button" class="chip-btn" onclick="App.insertChip('/orders/8')">/orders/8</button>
                 <button type="button" class="chip-btn" onclick="App.insertChip('200')">200</button>
                 <button type="button" class="chip-btn" onclick="App.insertChip('201')">201</button>
                 <button type="button" class="chip-btn" onclick="App.insertChip('400')">400</button>
@@ -1009,8 +1011,8 @@
         id: "stage1",
         title: "Stage 1：HTTPメソッドとREST基礎",
         desc: "GET/POST/PUT/PATCH/DELETEでほしくんの注文を自由自在に操作する！",
-        status: "locked",
-        lessonIds: []
+        status: "available",
+        lessonIds: ["s1-01", "s1-02", "s1-03", "s1-04", "s1-05", "s1-06"]
       },
       {
         id: "stage2",
@@ -1798,6 +1800,425 @@
         hint2: "最後にあなたのスマホで目に見えるようにする作業を思い出してね。",
         hint3: "答えは「DNS調査と暗号化接続」そして最後に「画面描画（レンダリング）」です！",
         afterNote: "おめでとうございます！Stage 0クリア！Webアクセスの全体像が1本の線でつながりましたね。あなたはもうWebの仕組み通です！"
+      },
+
+      // ------------------------------------------------------------------------
+      // Stage 1: HTTPメソッドとREST基礎 6レッスン (s1-01 〜 s1-06)
+      // ------------------------------------------------------------------------
+      {
+        id: "s1-01",
+        stageId: "stage1",
+        title: "GET＝取得",
+        subtitle: "サーバーからデータを受け取る",
+        slides: [
+          {
+            title: "メソッドの判断の基本型",
+            body: "Web APIでは、やりたい操作に合わせてメソッドを使い分けます。\n「取る=GET、作る=POST、書き換える=PUT（一部ならPATCH）、消す=DELETE」が4大メソッドの基本型です！",
+            figureHtml: `
+              <div class="diag-flow" style="flex-direction:column; align-items:stretch; gap:6px; font-size:0.9rem;">
+                <div class="diag-box highlight">📥 <b>GET</b>：取る（取得）</div>
+                <div class="diag-box">📤 <b>POST</b>：作る（作成）</div>
+                <div class="diag-box">✏️ <b>PUT / PATCH</b>：書き換える（更新）</div>
+                <div class="diag-box">🗑️ <b>DELETE</b>：消す（削除）</div>
+              </div>
+            `
+          },
+          {
+            title: "1件取るなら「GET /orders/番号」",
+            body: "すでに存在する注文から「特定の1件」を確認したいときは、メソッドに「GET」を使い、パスに対象の注文番号（例: /orders/5）を指定します。",
+            figureHtml: `
+              <div class="diag-flow">
+                <div class="diag-box highlight">GET<br><small>（取る）</small></div>
+                <div class="diag-arrow">＋</div>
+                <div class="diag-box highlight">/orders/5<br><small>（注文番号5）</small></div>
+                <div class="diag-arrow">➡️</div>
+                <div class="diag-box">1件取得！📦</div>
+              </div>
+            `
+          }
+        ],
+        example: {
+          scene: "注文番号5の内容を確認したい場面",
+          answer: "GET /orders/5",
+          reason: "1件取るならGET、対象は /orders/5"
+        },
+        problems: [
+          {
+            id: "s1-01-1",
+            scene: "注文番号8の内容を確認したい場面",
+            question: "サーバーから注文番号8の内容を確認（取得）するリクエストを選んでください。",
+            type: "choice",
+            choices: [
+              "GET /orders/8",
+              "POST /orders/8",
+              "DELETE /orders/8"
+            ],
+            answer: "GET /orders/8",
+            feedback: "正解！1件取るならGET、対象は /orders/8 です！"
+          },
+          {
+            id: "s1-01-2",
+            scene: "注文番号8の内容を確認したい場面",
+            question: "注文番号8を取得するリクエスト（メソッドとURL）を入力してください。",
+            type: "input_method_url",
+            expectedMethod: "GET",
+            expectedUrl: "/orders/8",
+            answer: "GET /orders/8",
+            feedback: "完璧です！「GET /orders/8」で注文番号8の内容を正確に取得できます！"
+          }
+        ],
+        hint1: "「取る」操作なのでGETを使おう。",
+        hint2: "対象の注文番号は8番だよ。下の挿入ボタンを使ってみよう！",
+        hint3: "答えは「GET /orders/8」です！",
+        afterNote: "「1件取るならGET、対象は /orders/番号」。すべてのAPI設計の土台となる一番大切な形です！"
+      },
+      {
+        id: "s1-02",
+        stageId: "stage1",
+        title: "POST＝作成",
+        subtitle: "サーバーに新しいデータを作る",
+        slides: [
+          {
+            title: "新しく作るなら「POST」",
+            body: "ショップで新しく注文を申し込むときのように、サーバー上に新しいデータを作成するときは「POST」メソッドを使います。",
+            figureHtml: `
+              <div class="diag-flow">
+                <div class="diag-box">📱 クライアント</div>
+                <div class="diag-arrow">➡️ <b>POST</b>（新しい注文データ） ➡️</div>
+                <div class="diag-box highlight">🏢 サーバー<br><small>データベースに保存！</small></div>
+              </div>
+            `
+          },
+          {
+            title: "まだ番号はないので「/orders」だけ",
+            body: "新しく作るときは、まだ注文番号が発行されていません（サーバーが自動で番号を決めてくれます）。そのため、URLの末尾に番号はつけず「/orders」だけにします！",
+            figureHtml: `
+              <div class="diag-flow">
+                <div class="diag-box highlight">POST /orders<br><small>（番号なしで注文箱に投函）</small></div>
+                <div class="diag-arrow">➡️</div>
+                <div class="diag-box">サーバー「注文番号8として作成したよ！」</div>
+              </div>
+            `
+          }
+        ],
+        example: {
+          scene: "新しい注文を1件作る場面",
+          answer: "POST /orders",
+          reason: "新しく作るならPOST、まだ番号はないので /orders だけ"
+        },
+        problems: [
+          {
+            id: "s1-02-1",
+            scene: "別の新しい注文を1件作る場面",
+            question: "新しい注文をサーバーに作成してもらうリクエストを選んでください。",
+            type: "choice",
+            choices: [
+              "POST /orders",
+              "GET /orders",
+              "POST /orders/8"
+            ],
+            answer: "POST /orders",
+            feedback: "正解！新しく作るならPOST、まだ番号はないので「/orders」だけを指定します！"
+          },
+          {
+            id: "s1-02-2",
+            scene: "別の新しい注文を1件作る場面",
+            question: "新しい注文を作成するリクエスト（メソッドとURL）を入力してください。",
+            type: "input_method_url",
+            expectedMethod: "POST",
+            expectedUrl: "/orders",
+            answer: "POST /orders",
+            feedback: "バッチリ！新しく作るならPOST、対象は番号なしの「POST /orders」です！"
+          }
+        ],
+        hint1: "新しく「作る」メソッドを思い出そう。",
+        hint2: "これから作るので、まだ番号はありません（/orders だけ）。",
+        hint3: "答えは「POST /orders」です！",
+        afterNote: "「作るならPOST」「番号はまだないので /orders だけ」。取得（GET）とのURLの違いに注目しましょう！"
+      },
+      {
+        id: "s1-03",
+        stageId: "stage1",
+        title: "PUT／PATCH＝更新",
+        subtitle: "全体か一部かで使い分ける",
+        slides: [
+          {
+            title: "書き換えるときの2つのメソッド",
+            body: "すでに存在するデータを書き換える（更新する）ときは、PUTまたはPATCHを使います。\n判断の型はとてもシンプルです！\n・全体を書き換える ＝ PUT\n・一部だけ書き換える ＝ PATCH",
+            figureHtml: `
+              <div class="diag-flow" style="flex-direction:column; align-items:stretch; gap:6px; font-size:0.9rem;">
+                <div class="diag-box">🔄 <b>PUT</b>：全体を書き換える（丸ごと置換）</div>
+                <div class="diag-box highlight">🩹 <b>PATCH</b>：一部だけ書き換える（部分変更）</div>
+              </div>
+            `
+          },
+          {
+            title: "対象の注文番号を指定する",
+            body: "更新したい既存の注文を指定するため、URLには「/orders/番号」をつけます。個数だけを変更するような場面では「PATCH /orders/5」を使います！",
+            figureHtml: `
+              <div class="diag-flow">
+                <div class="diag-box highlight">PATCH<br><small>（一部書き換え）</small></div>
+                <div class="diag-arrow">＋</div>
+                <div class="diag-box highlight">/orders/5<br><small>（注文番号5の個数変更）</small></div>
+              </div>
+            `
+          }
+        ],
+        example: {
+          scene: "注文番号5の個数だけを1→2に変える場面",
+          answer: "PATCH /orders/5",
+          reason: "一部だけ書き換えるならPATCH"
+        },
+        problems: [
+          {
+            id: "s1-03-1",
+            scene: "注文データを一部だけでなく「全体を丸ごと」置き換えて書き換える場面",
+            question: "データの「全体を書き換える」ときに使うメソッドはどっち？",
+            type: "choice",
+            choices: [
+              "PUT",
+              "PATCH",
+              "GET"
+            ],
+            answer: "PUT",
+            feedback: "大正解！全体を丸ごと書き換えるときはPUT、一部だけ書き換えるときはPATCHです！"
+          },
+          {
+            id: "s1-03-2",
+            scene: "注文番号8の個数だけを1→3に変える場面",
+            question: "注文番号8の個数（一部だけ）を書き換えるリクエストを選んでください。",
+            type: "choice",
+            choices: [
+              "PATCH /orders/8",
+              "PUT /orders/8",
+              "GET /orders/8"
+            ],
+            answer: "PATCH /orders/8",
+            feedback: "正解！一部だけ書き換えるならPATCH、対象は /orders/8 です！"
+          },
+          {
+            id: "s1-03-3",
+            scene: "注文番号8の個数だけを1→3に変える場面",
+            question: "注文番号8の個数を更新するリクエスト（メソッドとURL）を入力してください。",
+            type: "input_method_url",
+            expectedMethod: "PATCH",
+            expectedUrl: "/orders/8",
+            answer: "PATCH /orders/8",
+            feedback: "お見事！一部だけ書き換えるならPATCH、対象は「PATCH /orders/8」です！"
+          }
+        ],
+        hint1: "全体ならPUT、一部だけならPATCHだよ。",
+        hint2: "今回は個数だけ（一部だけ）を変えるのでPATCHを使うよ。番号は8番！",
+        hint3: "答えは「PATCH /orders/8」です！",
+        afterNote: "全体を書き換える=PUT、一部だけ書き換える=PATCH。このシンプルな使い分けさえ覚えておけばRESTは怖くありません！"
+      },
+      {
+        id: "s1-04",
+        stageId: "stage1",
+        title: "DELETE＝削除",
+        subtitle: "注文を取り消す",
+        slides: [
+          {
+            title: "消すなら「DELETE」",
+            body: "注文をキャンセルしたり、不要になったデータを削除するときは、その名のとおり「DELETE」メソッドを使います。",
+            figureHtml: `
+              <div class="diag-flow">
+                <div class="diag-box">📱 クライアント</div>
+                <div class="diag-arrow">➡️ <b>DELETE</b> ➡️</div>
+                <div class="diag-box highlight">🏢 サーバー<br><small>該当データを削除！🗑️</small></div>
+              </div>
+            `
+          },
+          {
+            title: "どのデータを消すか番号で指定",
+            body: "間違って他の注文を消してしまわないように、URLに対象の注文番号を明記します（例: /orders/5）。これで安全に取り消しができます！",
+            figureHtml: `
+              <div class="diag-flow">
+                <div class="diag-box highlight">DELETE<br><small>（消す）</small></div>
+                <div class="diag-arrow">＋</div>
+                <div class="diag-box highlight">/orders/5<br><small>（注文番号5を消去）</small></div>
+              </div>
+            `
+          }
+        ],
+        example: {
+          scene: "注文番号5を取り消す場面",
+          answer: "DELETE /orders/5",
+          reason: "消すならDELETE、対象は /orders/5"
+        },
+        problems: [
+          {
+            id: "s1-04-1",
+            scene: "注文番号8を取り消す場面",
+            question: "注文番号8を削除（取り消し）するリクエストを選んでください。",
+            type: "choice",
+            choices: [
+              "DELETE /orders/8",
+              "POST /orders/8",
+              "GET /orders/8"
+            ],
+            answer: "DELETE /orders/8",
+            feedback: "正解！消すならDELETE、対象は /orders/8 です！"
+          },
+          {
+            id: "s1-04-2",
+            scene: "注文番号8を取り消す場面",
+            question: "注文番号8を削除するリクエスト（メソッドとURL）を入力してください。",
+            type: "input_method_url",
+            expectedMethod: "DELETE",
+            expectedUrl: "/orders/8",
+            answer: "DELETE /orders/8",
+            feedback: "素晴らしい！消すならDELETE、対象は「DELETE /orders/8」です！"
+          }
+        ],
+        hint1: "削除するメソッドは英語の DELETE だよ。",
+        hint2: "消したい注文の番号は8番だよ。",
+        hint3: "答えは「DELETE /orders/8」です！",
+        afterNote: "「消すならDELETE、対象は /orders/番号」。直感的でわかりやすいですね！"
+      },
+      {
+        id: "s1-05",
+        stageId: "stage1",
+        title: "URLで対象を表す",
+        subtitle: "1件と一覧の違い",
+        slides: [
+          {
+            title: "番号があるか、ないか",
+            body: "RESTの優れた設計思想は、「URLを見るだけで1件なのか一覧なのかが分かる」ことです。\n・/orders ＝ 注文の一覧（複数）\n・/orders/5 ＝ 注文番号5（特定の1件）",
+            figureHtml: `
+              <div class="diag-flow" style="flex-direction:column; align-items:stretch; gap:6px; font-size:0.9rem;">
+                <div class="diag-box">📋 <b>/orders</b> ＝ 注文の一覧（複数件）</div>
+                <div class="diag-box highlight">🔍 <b>/orders/5</b> ＝ 注文番号5（特定の1件）</div>
+              </div>
+            `
+          },
+          {
+            title: "どちらもメソッドは「GET」",
+            body: "1件を見るのも一覧を見るのも、「取る」操作なのでメソッドは同じ「GET」です。URLの違いだけで対象を切り替えます！",
+            figureHtml: `
+              <div class="diag-flow">
+                <div class="diag-box"><b>GET /orders</b><br><small>一覧をまとめて取得</small></div>
+                <div class="diag-box highlight"><b>GET /orders/5</b><br><small>5番の1件だけ取得</small></div>
+              </div>
+            `
+          }
+        ],
+        example: {
+          scene: "「注文を1件取得」と「注文の一覧を取得」の違い",
+          answer: "1件は「GET /orders/5」、一覧は「GET /orders」",
+          reason: "番号があるかどうかで1件か一覧かが決まる"
+        },
+        problems: [
+          {
+            id: "s1-05-1",
+            scene: "すべての注文が並んだ「注文一覧」を取得したい場面",
+            question: "注文の一覧をまとめて取得するリクエストはどれ？",
+            type: "choice",
+            choices: [
+              "GET /orders",
+              "GET /orders/8",
+              "POST /orders"
+            ],
+            answer: "GET /orders",
+            feedback: "正解！特定の番号をつけずに「GET /orders」とすると、一覧を取得できます！"
+          },
+          {
+            id: "s1-05-2",
+            scene: "注文番号8の内容「1件」を確認したい場面",
+            question: "注文番号8の1件を取得するリクエスト（メソッドとURL）を入力してください。",
+            type: "input_method_url",
+            expectedMethod: "GET",
+            expectedUrl: "/orders/8",
+            answer: "GET /orders/8",
+            feedback: "パーフェクト！特定の1件を取るときは番号をつけて「GET /orders/8」です！"
+          }
+        ],
+        hint1: "一覧には番号がなく、特定の1件には番号がつくよ。",
+        hint2: "どちらもデータを「取る」操作なのでメソッドはGETだよ。",
+        hint3: "一覧は「GET /orders」、1件は「GET /orders/8」です！",
+        afterNote: "番号なし＝一覧、番号あり＝1件。URLに対象を綺麗に表現するのがRESTの設計美です！"
+      },
+      {
+        id: "s1-06",
+        stageId: "stage1",
+        title: "仕様からAPIを設計する（総合）",
+        subtitle: "注文の4大操作を通しでマスター！",
+        slides: [
+          {
+            title: "4大操作の設計表",
+            body: "Webアプリの根幹となる4つの基本操作（CRUD）がこちらです！\n・作る：POST /orders\n・取る：GET /orders/5\n・書き換える：PATCH /orders/5\n・消す：DELETE /orders/5",
+            figureHtml: `
+              <div class="diag-flow" style="flex-direction:column; align-items:stretch; gap:6px; font-size:0.88rem;">
+                <div class="diag-box">① 作る ➡️ <b>POST /orders</b></div>
+                <div class="diag-box highlight">② 取る ➡️ <b>GET /orders/5</b></div>
+                <div class="diag-box">③ 書き換える ➡️ <b>PATCH /orders/5</b></div>
+                <div class="diag-box">④ 消す ➡️ <b>DELETE /orders/5</b></div>
+              </div>
+            `
+          },
+          {
+            title: "あなたもAPIデザイナー！",
+            body: "場面に合わせて適切なメソッドとURLを判断できれば、どんなWebアプリの設計も理解できるようになります。通しで仕上げの問題に挑戦しよう！",
+            figureHtml: `
+              <div class="diag-flow">
+                <div class="diag-box">場面を想像</div>
+                <div class="diag-arrow">➡️</div>
+                <div class="diag-box highlight">メソッド＋URLで表現！✨</div>
+              </div>
+            `
+          }
+        ],
+        example: {
+          scene: "注文の「作る・取る・書き換える・消す」のAPI設計",
+          answer: "POST /orders、GET /orders/5、PATCH /orders/5、DELETE /orders/5",
+          reason: "作るならPOST（番号なし）、取るならGET、一部書き換えならPATCH、消すならDELETE"
+        },
+        problems: [
+          {
+            id: "s1-06-1",
+            scene: "新しい注文を1件「作る」場面",
+            question: "① 新しい注文を作成するリクエスト（メソッドとURL）を入力してください。",
+            type: "input_method_url",
+            expectedMethod: "POST",
+            expectedUrl: "/orders",
+            answer: "POST /orders",
+            feedback: "正解！新しく作るならPOST、まだ番号はないので「POST /orders」です！"
+          },
+          {
+            id: "s1-06-2",
+            scene: "注文番号8の内容を「取る（確認する）」場面",
+            question: "② 注文番号8の内容を取得するリクエスト（メソッドとURL）を入力してください。",
+            type: "input_method_url",
+            expectedMethod: "GET",
+            expectedUrl: "/orders/8",
+            answer: "GET /orders/8",
+            feedback: "正解！1件取るならGET、対象は「GET /orders/8」です！"
+          },
+          {
+            id: "s1-06-3",
+            scene: "注文番号8の個数だけを「書き換える（一部変更）」場面",
+            question: "③ 注文番号8の個数を更新するリクエスト（メソッドとURL）を入力してください。",
+            type: "input_method_url",
+            expectedMethod: "PATCH",
+            expectedUrl: "/orders/8",
+            answer: "PATCH /orders/8",
+            feedback: "正解！一部だけ書き換えるならPATCH、対象は「PATCH /orders/8」です！"
+          },
+          {
+            id: "s1-06-4",
+            scene: "注文番号8を「消す（取り消す）」場面",
+            question: "④ 注文番号8を削除するリクエスト（メソッドとURL）を入力してください。",
+            type: "input_method_url",
+            expectedMethod: "DELETE",
+            expectedUrl: "/orders/8",
+            answer: "DELETE /orders/8",
+            feedback: "大正解！消すならDELETE、対象は「DELETE /orders/8」です！4つの基本操作を完全制覇しました！"
+          }
+        ],
+        hint1: "順番は 作る(POST) → 取る(GET) → 書き換える(PATCH) → 消す(DELETE) だよ。",
+        hint2: "作るときだけ番号なし（/orders）、それ以外は8番（/orders/8）を指定するよ。",
+        hint3: "① POST /orders、② GET /orders/8、③ PATCH /orders/8、④ DELETE /orders/8 です！",
+        afterNote: "素晴らしい！！Stage 1完全制覇おめでとうございます！これでWebのHTTPメソッドとREST API設計の基礎は完璧です！"
       }
     ];
 
@@ -2223,7 +2644,14 @@
             detailedMsg = problem.feedback;
           } else if (!isMethodMatch && isUrlMatch) {
             isCorrect = false;
-            detailedMsg = `URL（${userUrl}）は合っていますが、メソッド名が違います！今回はデータを取得するので ${expMethod} を指定します。`;
+            const actionDesc = (
+              expMethod === "GET" ? "データを取得する" :
+              expMethod === "POST" ? "新しく作成する" :
+              expMethod === "PATCH" ? "一部を書き換える" :
+              expMethod === "PUT" ? "全体を書き換える" :
+              expMethod === "DELETE" ? "削除（取り消し）する" : "操作を行う"
+            );
+            detailedMsg = `URL（${userUrl}）は合っていますが、メソッド名が違います！今回は${actionDesc}ので ${expMethod} を指定します。`;
           } else if (isMethodMatch && !isUrlMatch) {
             isCorrect = false;
             detailedMsg = `メソッド（${userMethod}）は合っていますが、URLパスが違います！正解のパスは「${problem.expectedUrl}」です。`;
